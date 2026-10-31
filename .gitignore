@@ -1,0 +1,64 @@
+# Composer / PHP
+/vendor
+/auth.json
+composer.phar
+
+# Node / frontend build
+/node_modules
+/public/build
+/public/hot
+/public/storage
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Laravel runtime
+/storage/*.key
+/storage/pail
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
+*.log
+_ide_helper.php
+/public/fonts-manifest.dev.json
+
+# Окружение
+.env
+.env.*
+!.env.example
+
+
+# Документация: в git только ТЗ и план работ
+/docs/*
+!/docs/tz/
+!/docs/plan/
+
+# Тесты / QA
+/.phpunit.cache
+/.phpunit.result.cache
+coverage/
+.phpactor.json
+/test-results
+/playwright-report
+/blob-report
+
+# IDE / редакторы
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+*.iml
+*.swp
+*~
+
+# ОС
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+# Локальное окружение проекта
+Homestead.json
+Homestead.yaml
+/.php-cs-fixer.cache

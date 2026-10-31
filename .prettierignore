@@ -1,0 +1,17 @@
+vendor
+node_modules
+public
+storage
+bootstrap/cache
+test-results
+playwright-report
+*.md
+*.php
+*.lock
+package-lock.json
+composer.lock
+resources/css/tokens.css
+docs
+openspec
+.agents
+.opencode

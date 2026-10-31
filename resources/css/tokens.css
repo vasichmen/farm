@@ -1,0 +1,211 @@
+/* «Усадьба Лыково» — дизайн-токены v1.1 */
+:root {
+  --color-deep-pine: #22352A;  /* Основной тёмный фон, текст на светлом */
+  --color-forest: #2F4A3A;  /* Панели, меню, кнопка на светлом, выбранный чекбокс */
+  --color-fir: #3A5A47;  /* Наведение на Forest */
+  --color-ink: #16231B;  /* v1.1: текст на золотых кнопках и бейдже круглой кнопки */
+  --color-parchment: #F3EBDB;  /* Карточки, текст на тёмном */
+  --color-paper: #FBF7EE;  /* Фон полей ввода, календаря, таблицы */
+  --color-linen: #E7E0D1;  /* Фон светлых страниц */
+  --color-antique-gold: #B98B3E;  /* Заливки: главные кнопки, активный сезон, круглая кнопка. НЕ для мелкого текста на светлом */
+  --color-gold-pressed: #B08540;  /* v1.1: нажатая золотая кнопка (было #9F7632) */
+  --color-gold-text: #7F5D1F;  /* v1.1: золотой текст и ссылки на светлом фоне */
+  --color-honey: #D9B26F;  /* Наведение, акценты, золотой текст и ссылки на тёмном */
+  --color-brick: #9E4F3A;  /* Надзаголовки на светлом, ошибки */
+  --color-wormwood: #8FA58A;  /* Только заливки и точки (не текст) */
+  --color-wormwood-text: #566F51;  /* v1.1: зелёный текст на светлом */
+  --color-flax: #D9C9A3;  /* Линии и рамки на тёмном */
+  --color-winter-slate: #2B3E44;  /* Фон зимнего сезона */
+  --color-bark: #5B4636;  /* Стебли на иконках */
+  --color-hover-row: #EFE5D1;  /* Наведение на пункт списка, день календаря */
+  --color-icon-disc: #EADFC8;  /* Кружок-подложка под иконкой товара на кремовом */
+  --color-error-bg: #F8ECE6;  /* Фон поля с ошибкой */
+  --color-focus-on-dark: #D9B26F;  /* v1.1: фокус-кольцо на тёмном фоне */
+  --color-focus-on-light: #7F5D1F;  /* v1.1: фокус-кольцо на светлом фоне */
+  --color-line-on-dark: rgba(217,201,163,.6);  /* Рамки чипов, кнопки меню, полосы «Дальше» на тёмном */
+  --color-line-on-light: rgba(34,53,42,.15);  /* Разделители на светлом (декоративные) */
+  --color-field-border: rgba(34,53,42,.55);  /* v1.1: рамка поля, чекбокса, счётчика */
+  --color-placeholder: rgba(34,53,42,.65);  /* Подсказка в поле */
+  --color-overlay: rgba(15,22,18,.6);  /* Затемнение под меню, окном и шторкой */
+  --cat-vegetables: #D68A4E;  /* Овощи · круг */
+  --cat-garden: #C25C48;  /* Сад · ромб */
+  --cat-herbs: #8FA58A;  /* Травы · лист */
+  --badge-ok-bg: #DCE5D3;
+  --badge-ok-text: #3F5A35;
+  --badge-few-bg: #F1DFC0;
+  --badge-few-text: #75561F;
+  --badge-pre-bg: #ECD9D2;
+  --badge-pre-text: #8A4130;
+  --badge-out-bg: #E4DED2;
+  --badge-out-text: #4F5A52;
+  --season-spring: linear-gradient(180deg, #3A5A47, #2F4A3A);
+  --season-summer: linear-gradient(180deg, #44583A, #2D3E2A);
+  --season-autumn: linear-gradient(180deg, #2F4A3A, #22352A);
+  --season-winter: linear-gradient(180deg, #2B3E44, #1F2E33);
+
+  /* палитра иллюстраций: только для рисования новых иконок */
+  --illu-green-stem: #5E7149;
+  --illu-green-leaf: #6E8550;
+  --illu-green-mid: #7E9460;
+  --illu-green-light: #86A06A;
+  --illu-green-pale: #A3BA7A;
+  --illu-brown-bark: #5B4636;
+  --illu-brown-earth: #8C6A3E;
+  --illu-red-apple-dark: #B85A45;
+  --illu-red-apple: #CF7158;
+  --illu-red-tomato: #C2493E;
+  --illu-red-berry: #C2404A;
+  --illu-red-jam: #9E3E4C;
+  --illu-raspberry: #B2505F;
+  --illu-orange-pumpkin: #C47B3E;
+  --illu-orange-pumpkin-light: #D8924D;
+  --illu-orange-carrot: #D4793A;
+  --illu-yellow-pear: #C9B25E;
+  --illu-yellow-flower: #E2B04A;
+  --illu-yellow-seed: #F0D27A;
+  --illu-apple-chip: #D9A95A;
+  --illu-apple-chip-light: #EFD49B;
+  --illu-purple-currant: #3E3046;
+  --illu-purple-plum: #5A3E63;
+  --illu-purple-plum-light: #6B4A6E;
+  --illu-purple-grape: #7A5A8C;
+  --illu-pink-oregano: #9C5E80;
+  --illu-pink-oregano-light: #B9789A;
+  --illu-pink-fireweed: #B2507A;
+  --illu-kraft: #D2B88A;
+  --illu-kraft-dark: #B0925E;
+  --illu-jar-cloth: #E2D2B0;
+  --illu-petal: #FFFDF7;
+  --illu-petal-shadow: #E2D5B9;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Manrope', system-ui, sans-serif;
+
+  --radius-button: 4px;
+  --radius-input: 6px;
+  --radius-panel: 12px;
+  --radius-calendar: 8px;
+  --radius-card-arch-desktop: 72px 72px 6px 6px;
+  --radius-tile-arch-mobile: 60px 60px 6px 6px;
+  --radius-modal-arch-desktop: 260px 260px 8px 8px;
+  --radius-sheet-arch-mobile: 50vw 50vw 0px 0px;
+  --radius-tab-arch: 22px 22px 3px 3px;
+  --radius-chip-arch: 16px 16px 3px 3px;
+  --radius-tag-arch: 14px 14px 3px 3px;
+  --radius-badge-arch: 12px 12px 3px 3px;
+  --radius-stepper-arch: 22px 22px 4px 4px;
+  --radius-checkbox: 5px;
+  --radius-circle: 50%;
+  --border-hairline: 1px;
+  --border-field: 1.5px;
+  --border-focus: 2px;
+  --border-ring: 3px;
+  --shadow-fab: 0px 10px 24px 0px rgba(0,0,0,0.35);
+  --shadow-button-hover: 0px 8px 18px 0px rgba(0,0,0,0.25);
+  --shadow-card-hover: 0px 16px 28px 0px rgba(0,0,0,0.35);
+  --shadow-modal: 0px 30px 70px 0px rgba(0,0,0,0.4);
+  --shadow-dropdown: 0px 18px 40px 0px rgba(34,53,42,0.18);
+  --shadow-menu-panel: 20px 0px 50px 0px rgba(0,0,0,0.35);
+  --shadow-focus-glow: 0px 0px 0px 4px rgba(127,93,31,0.16);
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-44: 44px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+  --size-tap-min: 44px;
+  --size-header-btn-desktop: 56px;
+  --size-header-btn-mobile: 44px;
+  --size-fab-mobile: 62px;
+  --size-fab-badge: 22px;
+  --size-modal-width: 520px;
+  --size-menu-panel-width: 430px;
+  --size-content-max-desktop: 1440px;
+  --size-mobile-container-max: 520px;
+  --size-card-gap-x: 12px;
+  --size-card-gap-y: 14px;
+  --size-tile-gap: 10px;
+  --size-tile-min: 112px;
+  --size-tile-max: 146px;
+  --size-wheel-min: 480px;
+  --size-wheel-max: 680px;
+  --size-right-column-max: 610px;
+  --opacity-secondary-on-dark: 0.72;
+  --opacity-secondary-on-light: 0.75;
+  --opacity-disabled: 0.38;
+  --opacity-dimmed-tile: 0.3;
+  --opacity-inactive-sector-icons: 0.7;
+  --z-base: 0;
+  --z-header: 10;
+  --z-fab: 20;
+  --z-overlay: 30;
+  --z-dialog: 31;
+  --z-menu: 40;
+  --z-tooltip: 50;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --focus-offset-card: 4px;
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+  --dur-wheel: 700ms;
+  --dur-stagger: 60ms;
+  --dur-stagger-mobile: 40ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* адаптивные размеры десктопа (см. README, раздел «Адаптив») */
+  --wheel: clamp(480px, min(47vw, calc(100vh - 170px)), 680px);
+  --pad-left: clamp(32px, 4.2vw, 60px);
+  --col-gap: clamp(36px, 3.5vw, 50px);
+  --pad-right: clamp(32px, 2.8vw, 40px);
+  /* высота плитки телефона: 9 плиток в один экран, иначе прокрутка */
+  --tile: clamp(112px, calc((100dvh - 310px) / 3), 146px);
+}
+
+/* брейкпоинт: десктоп с 1200 px (в CSS переменные в @media не работают) */
+/* @media (min-width: 1200px) { … } */
+
+/* фокус */
+.on-dark :focus-visible { outline: var(--focus-width) solid var(--color-focus-on-dark); outline-offset: var(--focus-offset); }
+.on-light :focus-visible { outline: var(--focus-width) solid var(--color-focus-on-light); outline-offset: var(--focus-offset); }
+
+/* Типографика: готовые классы */
+.t-h1 { font-family: var(--font-display); font-weight: 600; font-size: 52px; line-height: 1.04; }
+.t-h1-wheel { font-family: var(--font-display); font-weight: 600; font-size: 44px; line-height: 1.04; }
+.t-h1-mobile { font-family: var(--font-display); font-weight: 600; font-size: 40px; line-height: 1.04; }
+.t-season-title-mobile { font-family: var(--font-display); font-weight: 600; font-size: 44px; line-height: 0.95; }
+.t-h2 { font-family: var(--font-display); font-weight: 600; font-size: 38px; line-height: 1.1; }
+.t-h3 { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.15; }
+.t-product-title { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1.02; }
+.t-card-title { font-family: var(--font-display); font-weight: 700; font-size: 18.5px; line-height: 1.05; }
+.t-quote { font-family: var(--font-display); font-weight: 500; font-size: 22px; line-height: 1.3; font-style: italic; }
+.t-price { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.0; }
+.t-body { font-family: var(--font-ui); font-weight: 400; font-size: 16px; line-height: 1.6; }
+.t-body-s { font-family: var(--font-ui); font-weight: 400; font-size: 14.5px; line-height: 1.55; }
+.t-small { font-family: var(--font-ui); font-weight: 600; font-size: 13px; line-height: 1.5; }
+.t-tile-title { font-family: var(--font-ui); font-weight: 800; font-size: 13px; line-height: 1.15; }
+.t-caption { font-family: var(--font-ui); font-weight: 700; font-size: 12px; line-height: 1.3; }
+.t-overline { font-family: var(--font-ui); font-weight: 800; font-size: 12px; line-height: 1.3; letter-spacing: 2.5px; text-transform: uppercase; }
+.t-button { font-family: var(--font-ui); font-weight: 800; font-size: 13px; line-height: 1.0; letter-spacing: 1.2px; text-transform: uppercase; }
+.t-nav { font-family: var(--font-ui); font-weight: 600; font-size: 13px; line-height: 1.0; letter-spacing: 2px; text-transform: uppercase; }
+.t-label { font-family: var(--font-ui); font-weight: 800; font-size: 11px; line-height: 1.3; letter-spacing: 2px; text-transform: uppercase; }
+.t-badge { font-family: var(--font-ui); font-weight: 800; font-size: 11px; line-height: 1.0; letter-spacing: 0.8px; text-transform: uppercase; }
+.t-input { font-family: var(--font-ui); font-weight: 400; font-size: 15.5px; line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-property: opacity !important; transition-duration: 150ms !important; animation: none !important; }
+}
