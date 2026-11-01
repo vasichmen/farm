@@ -1,0 +1,3 @@
+<svg {{ $attributes }} xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+<path fill="#c9a06a" d="M18 52c0-16 14-24 30-22 18 2 32 10 32 26 0 14-14 24-32 22S18 68 18 52"/><path fill="#b88d58" d="M48 62c0-10 10-16 22-14s20 8 18 20c-2 10-12 16-24 14-10-2-16-10-16-20"/><ellipse cx="30" cy="46" fill="#8c6a3e" opacity=".7" rx="2.2" ry="1.4"/><ellipse cx="42" cy="58" fill="#8c6a3e" opacity=".7" rx="2.2" ry="1.4"/><ellipse cx="56" cy="40" fill="#8c6a3e" opacity=".7" rx="2.2" ry="1.4"/><ellipse cx="64" cy="62" fill="#8c6a3e" opacity=".7" rx="2.2" ry="1.4"/><ellipse cx="76" cy="70" fill="#8c6a3e" opacity=".7" rx="2.2" ry="1.4"/><ellipse cx="30" cy="42" fill="#fff" opacity=".2" rx="6" ry="3"/>
+</svg>

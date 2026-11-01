@@ -1,0 +1,3 @@
+<svg {{ $attributes }} xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+<path fill="#b85a45" d="M38 40c-6-4-20-4-24 8-4 13 4 31 14 35 5 2 7-1 10-1s6 3 10 1c10-4 18-22 14-35-4-12-18-12-24-8"/><path fill="#cf7158" d="M62 34c-6-4-20-4-24 8-4 13 4 31 14 35 5 2 7-1 10-1s6 3 10 1c10-4 18-22 14-35-4-12-18-12-24-8"/><path fill="none" stroke="#5b4636" stroke-linecap="round" stroke-width="3" d="M62 34c0-7 2-12 5-15"/><path fill="#6e8550" d="M65 22c1.774-9.16 11.752-14.493 17.904-11.625C81.13 19.535 71.152 24.87 65 22"/><ellipse cx="50" cy="48" fill="#fff" opacity=".25" rx="4" ry="8" transform="rotate(20 50 48)"/>
+</svg>

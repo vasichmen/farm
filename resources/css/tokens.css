@@ -147,6 +147,8 @@
   --opacity-disabled: 0.38;
   --opacity-dimmed-tile: 0.3;
   --opacity-inactive-sector-icons: 0.7;
+  --opacity-inactive-sector-icons-hover: 0.9;   /* v1.2: наведение на неактивный сектор */
+  --opacity-active-sector-icons: 1;
   --z-base: 0;
   --z-header: 10;
   --z-fab: 20;
@@ -172,6 +174,12 @@
   --pad-left: clamp(32px, 4.2vw, 60px);
   --col-gap: clamp(36px, 3.5vw, 50px);
   --pad-right: clamp(32px, 2.8vw, 40px);
+  /* v1.2: иконки на колесе. Колесо — SVG viewBox 700 × 700, размеры в его единицах, масштабируются вместе с колесом */
+  --wheel-disc-active: calc(var(--wheel) * 50 / 700);    /* 1440 × 900 ≈ 48 px */
+  --wheel-disc-inactive: calc(var(--wheel) * 40 / 700);  /* 1440 × 900 ≈ 39 px */
+  --wheel-icon-ratio: 0.76;                               /* иконка = 76 % диаметра кружка */
+  --wheel-icon-hover-scale: 1.1;
+  --wheel-icon-hover-ring: 2px solid var(--color-honey); /* в единицах колеса: r = кружок/2 + 3, линия 2 */
   /* высота плитки телефона: 9 плиток в один экран, иначе прокрутка */
   --tile: clamp(112px, calc((100dvh - 310px) / 3), 146px);
 }

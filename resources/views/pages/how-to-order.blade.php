@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="page">
+    <section class="prose">
         <h1>Как оформить заказ</h1>
         <p>
             Раздел «Как оформить заказ» скоро опишет шаги заказа: выбор продуктов, оформление

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="page">
+    <section class="prose">
         <h1>Предзаказ</h1>
         <p>
             Раздел «Предзаказ» скоро расскажет, как выбрать сезон и заранее заказать продукты

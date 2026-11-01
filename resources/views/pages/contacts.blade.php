@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="page">
+    <section class="prose">
         <h1>Контакты</h1>
         <p>
             Раздел «Контакты» скоро расскажет, как связаться с «Усадьбой Лыково», где находится

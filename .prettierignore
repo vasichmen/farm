@@ -11,6 +11,7 @@ playwright-report
 package-lock.json
 composer.lock
 resources/css/tokens.css
+resources/assets
 docs
 openspec
 .agents

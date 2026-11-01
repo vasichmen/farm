@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="page">
+    <section class="prose">
         <h1>Усадьба Лыково</h1>
         <p>
             Здесь скоро появится главная страница: сезоны, продукты с фермы и прогулки по хозяйству.
@@ -10,7 +10,6 @@
     </section>
 
     <div
-        class="island-slot"
         data-island="scaffold-probe"
         data-props='{"message":"Проверочный остров: клиентские скрипты подключены."}'
     ></div>

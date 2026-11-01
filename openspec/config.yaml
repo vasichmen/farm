@@ -1,13 +1,15 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+# Project context — constraints for OpenSpec artifacts and workflows.
+context: |
+  Имя change'а и capability — английский kebab-case по смыслу, глагол + объект:
+  add-design-system-foundation, fix-season-wheel-scroll. Русское описание сначала
+  переводится на английский. Транслитерация и «slug по символам» запрещены: имя из
+  одних дефисов, цифр или случайных обрубков (-----1, change-2) недопустимо.
+  Если осмысленное английское имя не получается — спросить пользователя, не выдумывать.
+
+  Содержимое артефактов (proposal, design, tasks, specs) — по-русски, как остальная
+  документация проекта. Английский — только в именах каталогов, ID, коде и enum-значениях.
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.

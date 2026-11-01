@@ -1,0 +1,25 @@
+[data-island='scaffold-probe'] {
+    min-height: 96px;
+    margin-top: var(--space-32);
+    padding: var(--space-16);
+    border: var(--border-hairline) dashed var(--color-line-on-dark);
+    border-radius: var(--radius-panel);
+}
+
+.scaffold-probe__message {
+    margin-bottom: var(--space-12);
+}
+
+.scaffold-probe__button {
+    padding: var(--space-8) var(--space-16);
+    font: inherit;
+    color: var(--color-ink);
+    background: var(--color-antique-gold);
+    border: 0;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+}
+
+.scaffold-probe__button:hover {
+    background: var(--color-honey);
+}

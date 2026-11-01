@@ -1,0 +1,36 @@
+.site-header {
+    color: var(--color-deep-pine);
+    background: var(--color-parchment);
+    border-bottom: var(--border-hairline) solid var(--color-line-on-light);
+}
+
+.site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-16);
+    padding-block: var(--space-16);
+}
+
+.site-nav a {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--color-gold-text);
+    text-decoration: none;
+}
+
+.site-nav a:hover {
+    color: var(--color-deep-pine);
+}
+
+.site-main {
+    padding-block: var(--space-40);
+    color: var(--color-parchment);
+}
+
+.site-main a {
+    color: var(--color-honey);
+}
+
+.site-main a:hover {
+    color: var(--color-parchment);
+}
