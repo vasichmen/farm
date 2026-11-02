@@ -32,8 +32,8 @@ description: Справочники через vasichmen/laravel-handbooks — c
        'update_request' => Update{Entity}HandbookRequest::class,
        'searchable_fields' => ['title', 'slug'],
        'with' => [
-           'list' => ['rSeason'],                 // методы list
-           'detail' => ['rSeason'],               // create/update/detail
+           'list' => ['season'],                  // методы list
+           'detail' => ['season'],                // create/update/detail
        ],
        // 'readonly' => true,                      // только чтение
        // 'create_middleware' / 'update_middleware' / 'delete_middleware' / 'view_middleware'

@@ -54,8 +54,15 @@
   и без ломающих изменений для уже подключённого кода (см. §7).
 - Git Flow, основная ветка `master`. Коммиты и пуш — только по явной просьбе пользователя.
 - Отладка — `dd()` / `dump()`.
+- Backend отдаёт **сырые данные**: числа, enum-коды, массивы, строки контента, даты в UTC.
+  Форматирование для отображения (цена, вес, фасовка, склонения, даты, регистр, подписи
+  статусов) выполняет слой отображения (Blade/Vue); вычисление локального месяца и
+  часового пояса — только на клиенте.
+- Время в БД хранится и передаётся в UTC; сервер не применяет часовой пояс пользователя.
+- Для наборов данных — `Illuminate\Support\Collection`; для строк и массивов — `Str`/`Arr`,
+  а не нативные `mb_*`, `array_slice`, `array_filter`, `array_map`, `array_merge`, `usort`.
 - Тесты: приоритет — Playwright (сценарии страницы); feature/unit-тесты — только на то,
-  что дорого ломать (выдача сезонов/товаров, форматирование цены, веса, склонений).
+  что дорого ломать (выдача сезонов/товаров, slug, идемпотентность).
   Playwright ещё не подключён — настройка входит в фазу 0.
 
 ---
@@ -68,8 +75,8 @@
 ```text
 app/
 ├── DTO/
-│   ├── Models/                  # DTO сущностей: {Entity}DTO
-│   └── Request/{Entity}/        # DTO конкретных запросов
+│   ├── HomePageDTO.php          # DTO агрегата страницы со сложной структурой
+│   └── Request/{Entity}/        # DTO конкретных запросов (не сущностей)
 ├── Enums/                       # native enums, *Enum
 ├── Exceptions/                  # доменные исключения, Handler
 ├── Http/
@@ -77,7 +84,7 @@ app/
 │   ├── Middleware/              # middleware проекта
 │   ├── Presenters/              # свои презентеры, если пакетных не хватает
 │   ├── Requests/{Entity}/       # FormRequest по сущностям (+ Handbook/)
-│   └── Resources/               # API Resources (+ Short/, DTO/)
+│   └── Resources/               # ресурсы сущностей + page-ресурсы (+ Short/, DTO/)
 ├── Models/                      # Eloquent-модели (+ Pivot/, Relations/)
 ├── Providers/                   # AppServiceProvider: $modelList, настройки пакетов
 ├── Repositories/                # репозитории, по одному на модель
@@ -144,7 +151,7 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
 | Service | бизнес-логику, транзакции, проверки доступа | прямой доступ к БД в обход репозитория |
 | Repository | доступ к БД, сложные выборки | бизнес-логику |
 | Model | связи, касты, `$fillable` | бизнес-логику, мутации извне репозитория |
-| Resource | представление сущности для JSON | запросы к БД |
+| Resource | представление сущности для фронта (JSON, props островов) | запросы к БД, бизнес-логику |
 | Presenter | обёртка ответа (`error/content`, пагинация) | бизнес-логику |
 | Blade-шаблон | разметка и серверный контент | запросы к БД |
 
@@ -189,7 +196,11 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
 - `AbstractDto` сам конвертирует `snake_case` входных ключей в `camelCase` свойства
   (включая вложенные DTO, enum, даты); `toArray()` отдаёт обратно `snake_case`.
 - Массивы DTO объявляются через `getDtoArrays()`.
-- `app/DTO/Models/{Entity}DTO.php` — DTO сущности, `app/DTO/Request/{Entity}/` — DTO запроса.
+- `app/DTO/Request/{Entity}/` — DTO запроса. DTO сущностей для отдачи на фронт не создаются:
+  наружу идут только ресурсы.
+- Исключение — `app/DTO/{Page}DTO.php`: DTO агрегата страницы, когда в одном ответе нужно
+  отдать разные сущности в сложной структуре. Такой DTO может содержать модели и
+  `Collection` моделей; ресурс для него — в `app/Http/Resources/DTO/`.
 - Если допустимы неизвестные ключи — переопределить конструктор и вызвать
   `parent::parseData($data, false)`.
 
@@ -236,15 +247,22 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
 
 ### 5.7. Ресурсы и презентеры
 
-Нужны только там, где отдаётся JSON (справочники и будущие API-эндпоинты). Страницы
-сайта рендерит Blade, Resource для них не создаётся.
+На каждую сущность — ровно один Resource: `app/Http/Resources/{Entity}Resource.php`,
+наследник `Laravel\Foundation\Abstracts\AbstractResource`. Внутри кода сервисы и
+репозитории работают с моделями и `Collection` моделей; на фронт модели попадают только
+через Resource. Resource применяется на слое ответа — в контроллере или агрегирующем
+page-ресурсе, но не внутри сервиса/репозитория.
 
 - Resource — наследник `Laravel\Foundation\Abstracts\AbstractResource`.
+- Для страницы с несколькими сущностями — DTO агрегата (`app/DTO/{Page}DTO.php`) и
+  page-ресурс (`app/Http/Resources/DTO/{Page}Resource.php`), который собирается из ресурсов
+  сущностей и не дублирует их поля.
+- `id` и `slug` — идентификаторы для фронта; `slug` не принимается из Request.
 
 | Метод | Назначение |
 |---|---|
 | `getFields([...])` | простые поля (только реально загруженные) |
-| `getRelation('rX', XResource::class)` | связь (не загружена → `[]`) |
+| `getRelation('season', SeasonResource::class)` | связь (не загружена → `[]`) |
 | `getEnum('field')` | enum → `{id, name, description?}` с переводом |
 | `getEnumArray('field', Enum::class)` | массив enum'ов |
 | `getDate('field')` / `renderDate('field')` | дата из модели / из DTO |
@@ -253,10 +271,12 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
 
 - `*_id`, являющийся FK для `belongsTo`, не выводить напрямую — только через `getRelation()`.
 - «Короткие» представления (dropdown, связи) — ресурсы в `app/Http/Resources/Short/`;
-  вложенные DTO — в `app/Http/Resources/DTO/`.
+  ресурсы page-DTO — в `app/Http/Resources/DTO/`.
 - Ответ оборачивать презентером: `DataResultPresenter` (одиночный), `PaginatedDataPresenter`
   (список, при несовпадении имён — `resourceNamespace:`). Ошибки — через исключения
   (`ValidationExceptionPresenter`, `ApiExceptionPresenter`, `AbstractExceptionHandler`).
+- Resource отдаёт сырые значения без вычисленных `*_label`-полей; форматирование
+  выполняет слой отображения (Blade/Vue).
 
 ### 5.8. Авторизация и доступ
 
@@ -277,6 +297,8 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
   `names` / `descriptions`). Без перевода `render()`/`trans()` бросят
   `EnumTransNotFoundException` и упадёт любой Resource с `getEnum()`.
 - Значение enum — `snake_case`, стабильное: это контракт с БД и фронтом.
+- В миграциях — `$table->enum('field', EnumClass::values())`; для добавления нового
+  значения — отдельная миграция с трейтом `EnumDBCheckAlterable` и вызовом `$this->alterEnum(...)`.
 - Enum, нужный фронту как справочник, добавляется в `config/handbooks.php` → `enums`;
   пакет сам отдаёт его по `/enum/{kebab-имя}`.
 - В Resource — только `getEnum()` / `getEnumArray()` / `renderEnum()`, чтобы фронт получал `{id, name}`.
@@ -300,6 +322,8 @@ Route → Request (валидация + DTO) → Controller → Service → Repo
 - `prefers-reduced-motion` уважается во всех анимациях: только opacity 150 ms.
 - Токены — из `docs/handoff/04-tokens`, шрифты (Cormorant Garamond, Manrope) хостим сами
   (WOFF2, сабсеты cyrillic+latin, `font-display: swap`).
+- Форматирование цены, веса, фасовки, склонений и дат — на фронтенде. Часовой пояс и
+  локальный месяц пользователя определяет фронтенд; сервер отдаёт UTC и сырые значения.
 - SVG-ассеты чистим на сборке через SVGO (`removeMetadata`), C2PA-метаданные в репозиторий не тащим.
 
 ---
@@ -321,6 +345,11 @@ DB_USERNAME=ippu
 DB_PASSWORD=ippu
 ```
 
+- Каждая колонка в миграции описывается `->comment('…')`; для `created_at`/`updated_at`
+  явно указывается хранение в UTC.
+- В модели у каждого поля в `$fillable` — inline-комментарий с названием и назначением.
+- Даты и время хранятся в БД в UTC и передаются на фронт в UTC; сервер не переводит их
+  в часовой пояс пользователя.
 - Снапшота схемы и команды `db:dump-schema` в проекте нет — актуальная схема читается
   из миграций.
 
@@ -346,7 +375,10 @@ DB_PASSWORD=ippu
 - Свойства, методы, переменные — `camelCase`; компоненты Vue — `StudlyCase` (`SeasonWheel.vue`).
 - Константы — `CAPS_LOCK` (`const int CACHE_TTL = 3600;`).
 - Классы — `StudlyCase`, файлы — PSR-4.
-- Связи моделей — с префиксом `r*` (`rSeason`, `rCategory`), ключи в конфигах и JSON — `r_season`, `r_category`.
+- Связи моделей — без префикса `r*`: `season`, `category`, `products`; ключи в конфигах и JSON —
+  `snake_case` (`season`, `category`).
+- Slug — техническое поле: генерируется на событии модели, не принимается из Request и не
+  редактируется с фронта. Resource отдаёт `slug` и `id` как идентификаторы для URL.
 - Не переименовывать существующие публичные поля, методы и ключи JSON: на них завязаны фронт и сидеры.
 - Каталоги change'ей OpenSpec (`openspec/changes/{name}`) и capability — английский
   `kebab-case` по смыслу, глагол + объект: `add-design-system-foundation`,
@@ -370,6 +402,13 @@ DB_PASSWORD=ippu
 - `app(SomeService::class)->method()` для новых сервисов/репозиториев.
 - SPA-подходы: `vue-router`, Inertia, SSR, Composition API, единый корневой экземпляр Vue.
 - SEO-контент внутри контейнера острова.
+- Отдача модели/коллекции моделей на фронт в обход Resource.
+- Resource внутри сервиса или репозитория; сервис должен возвращать модели.
+- Форматирование данных для отображения на backend (цена, вес, склонения, даты, статусы).
+- Серверный часовой пояс для пользовательских дат и локального месяца.
+- Нативные `mb_*`, `array_slice`, `array_filter`, `array_map`, `array_merge`, `usort` вместо
+  `Collection`, `Str`, `Arr` (кроме границы API, где нужен массив: `->all()`).
+- Колонка миграции без `->comment(...)` и поле `$fillable` без inline-комментария.
 - Redis, Kafka, очереди, Telescope, S3 — без отдельного решения.
 - Коммит или пуш без явной просьбы пользователя.
 
@@ -392,8 +431,13 @@ npx playwright test                    # когда Playwright настроен
 - в контроллере нет бизнес-логики и запросов к БД;
 - SEO-контент отдаётся Blade, а не монтируется JS;
 - у каждого нового enum есть перевод;
+- у каждой сущности есть `{Entity}Resource`; модели наружу идут только через Resource;
+- в Resource нет отформатированных `*_label`-полей и серверного часового пояса;
+- каждая колонка миграции и каждое поле `$fillable` имеют комментарий;
+- в приложении нет нативных `array_*`/`mb_*` вместо коллекций и `Str`/`Arr`;
 - справочники подключены только через `config/handbooks.php`;
 - вёрстка сверена с ТЗ и токенами `docs/handoff/04-tokens` (пиксельного сравнения нет, ТЗ §18);
+- если фаза закрыта: change заархивирован, а `docs/plan/PLAN.md` обновлён — `✅` в §3 и в заголовке фазы §4, актуальная «Текущая точка»;
 - не тронут `vendor/`.
 
 Полный чек-лист — skill `definition-of-done`.

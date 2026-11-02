@@ -25,7 +25,10 @@ description: Пошаговый алгоритм добавления новой
 
 - `php artisan make:migration create_{entity}_table`.
 - Колонки `snake_case`, FK — `{model}_id`, индексы на FK и поля фильтрации.
-- Значения enum в БД — строка/целое, совпадающее с `value` кейса.
+- Enum-колонки — `$table->enum('status', StatusEnum::values())`, не строкой с ручным
+  перечислением; при добавлении значения — миграция с трейтом `EnumDBCheckAlterable`
+  и вызовом `$this->alterEnum(...)`.
+- `slug` — unique, но в миграции не заполняется вручную: генерируется на событии модели.
 - Снапшота схемы в проекте нет: схема читается из миграций.
 
 ## 2. Модель
@@ -36,19 +39,23 @@ description: Пошаговый алгоритм добавления новой
 class {Entity} extends AbstractModel
 {
     protected $table = '{entity}';
-    protected $fillable = ['title', 'slug', 'sort_order', 'active', 'season_id'];
+    protected $fillable = ['title', 'sort_order', 'active', 'season_id'];
     protected $casts = ['active' => 'boolean', 'sort_order' => 'integer'];
 
-    public function rSeason(): BelongsTo
+    public function season(): BelongsTo
     {
         return $this->belongsTo(Season::class, 'season_id');
     }
 }
 ```
 
-- Связи — с префиксом `r*`, ключи в JSON/конфигах — `snake_case`.
-- `$fillable` содержит всё, что разрешено менять через репозиторий.
+- Связи — без префикса `r*` (`season`, `category`), ключи в JSON/конфигах — `snake_case`.
+- `$fillable` содержит всё, что разрешено менять через репозиторий; `slug` попадает туда
+  только для технического контрактного значения (например, сезоны), иначе его ставит трейт.
 - Enum-поля — `$casts = ['status' => ProductStatusEnum::class]`.
+- `slug` не входит в DTO/Request и не редактируется с фронта: трейт `GeneratesSlugTrait`
+  генерирует его на `saving` из `name`; контрактные slug'и (например, сезоны) задаются
+  технически в сидере.
 
 ## 3. Репозиторий
 
@@ -67,12 +74,14 @@ class {Entity} extends AbstractModel
 до сервисов и ресурсов: `app/Enums/{Name}Enum.php` + перевод в `lang/ru/enums.php`.
 Детали — skill `enums-and-translations`.
 
-## 6. DTO
+## 6. Ресурсы и DTO
 
-- DTO сущности: `app/DTO/Models/{Entity}DTO.php` — если сущность отдаётся в JSON.
-- DTO запросов: `app/DTO/Request/{Entity}/`.
-- Свойства `camelCase` с типами, `toArray()` отдаёт `snake_case`.
-- Детали — skill `request-dto`.
+- Resource сущности обязателен: `app/Http/Resources/{Entity}Resource.php`, наследник
+  `AbstractResource`. Сервис/репозиторий возвращают модели, Resource применяется
+  в контроллере или page-ресурсе.
+- DTO сущности для отдачи на фронт не создаётся.
+- DTO запросов: `app/DTO/Request/{Entity}/` — свойства `camelCase`, `toArray()` в `snake_case`.
+- Детали — skills `resource-presenter` и `request-dto`.
 
 ## 7. Request
 
@@ -109,7 +118,8 @@ class {Entity} extends AbstractModel
 
 ## 11. Сидеры
 
-- `database/seeders/{Entity}Seeder.php`, идемпотентно (`updateOrCreate` по `slug`/`code`).
+- `database/seeders/{Entity}Seeder.php`, идемпотентно (`updateOrCreate` по вычисленному
+  `Model::makeSlug($name)` или `code`); контрактный slug (сезоны) задаётся явно.
 - Мок-контент — из `docs/tz/TZ-lyk-farm.md` §10.3 и §22.2 (таблица контента дизайнера), без выдуманных фактов.
 - Сидер подключается в `DatabaseSeeder` в правильном порядке (сначала справочники, потом связи).
 

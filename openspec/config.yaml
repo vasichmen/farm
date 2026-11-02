@@ -22,13 +22,20 @@ context: |
 #       - Break tasks into chunks of max 2 hours
 
 # Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+# Advisory guidance for how apply and archive work should be conducted.
+operations:
+  apply:
+    guidance:
+      - "Когда все задачи change'а закрыты, напомнить, что фазу надо отметить в
+        docs/plan/PLAN.md, и обновить PLAN.md сразу после архивации change'а."
+  archive:
+    guidance:
+      - "Архивация change'а = закрытие фазы из docs/plan/PLAN.md. После архивации
+        обязательно обновить PLAN.md в этой же сессии, иначе фаза считается незакрытой."
+      - "В таблице §3 «Сводка фаз» поставить статус «✅ сделано» и вписать имя
+        заархивированного change'а в колонку «Change»."
+      - "В заголовке фазы в §4 заменить «— ⬜ не начата» на «— ✅ сделано»."
+      - "Обновить строку «Текущая точка» в шапке файла, а при необходимости — списки
+        §1.1 «Что уже работает» и §1.2 «Чего ещё нет»."
+      - "Заголовок и строка статуса должны совпадать с фактическим содержимым
+        openspec/changes/archive на конец сессии; откладывать отметку до фазы 13 нельзя."

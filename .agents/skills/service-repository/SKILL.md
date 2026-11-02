@@ -6,6 +6,7 @@ description: Бизнес-логика и доступ к данным в lyk-fa
 # Сервис и репозиторий
 
 Правила: `rules.md` §4. Вся логика — в сервисе, весь доступ к БД — в репозитории.
+Сервис возвращает модели или `Collection` моделей; Resource в сервисе не применяется.
 
 ## 1. Сервис
 
@@ -43,8 +44,8 @@ class {Entity}Service extends AbstractService
 - Доменные исключения (`{Entity}NotFoundException`, `DefaultException`).
 - Проверки доступа — в начале операции (skill `access-control`).
 - Общая логика нескольких сервисов — трейт `app/Traits/Service/`, не хелпер.
-- Форматирование (цена, вес, склонения) — отдельный сервис с тестами, а не разбросанное
-  по шаблонам и компонентам.
+- Сервис отдаёт сырые значения (число, enum-код, строку, UTC-дату). Форматирование
+  (цена, вес, склонения, даты, подписи статусов) и локальный часовой пояс — на фронтенде.
 
 ## 2. Репозиторий
 
@@ -73,9 +74,9 @@ class {Entity}Repository extends AbstractRepository
     public static function getVisibleForSeason(string $seasonSlug): Collection
     {
         return static::query()
-            ->whereHas('rSeasons', fn ($q) => $q->where('slug', $seasonSlug))
+            ->whereHas('seasons', fn ($q) => $q->where('slug', $seasonSlug))
             ->where('status', '!=', ProductStatusEnum::Out)
-            ->with(['rCategory'])
+            ->with(['category'])
             ->orderBy(['sort_order' => 'asc'])
             ->get();
     }

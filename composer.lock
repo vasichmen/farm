@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3aa6643db0ed0d62c002536b3498268b",
+    "content-hash": "dae55ff9b508808a4bb7e8e115b54f0f",
     "packages": [
         {
             "name": "brick/math",
@@ -5970,6 +5970,50 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
+            "name": "vasichmen/laravel-foundation",
+            "version": "v2.19.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vasichmen/laravel-foundation.git",
+                "reference": "058a1880257705e86b05fad2cda696ea396cad04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vasichmen/laravel-foundation/zipball/058a1880257705e86b05fad2cda696ea396cad04",
+                "reference": "058a1880257705e86b05fad2cda696ea396cad04",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": "^9.32|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Foundation\\": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "vasichmen",
+                    "email": "vass.vass@mail.ru"
+                }
+            ],
+            "description": "Laravel Package Foundation",
+            "support": {
+                "issues": "https://github.com/vasichmen/laravel-foundation/issues",
+                "source": "https://github.com/vasichmen/laravel-foundation/tree/v2.19.0"
+            },
+            "time": "2026-10-31T09:58:45+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.8.0",
             "source": {
@@ -8654,7 +8698,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3"
+        "php": "^8.4"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

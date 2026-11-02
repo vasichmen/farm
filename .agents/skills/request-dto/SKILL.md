@@ -36,7 +36,6 @@ class Create{Entity}Request extends AbstractRequest
     {
         return [
             'title' => ['required', 'string'],
-            'slug' => ['required', 'string', new Unique('products', 'slug')],
             'status' => ['required', Rule::enum(ProductStatusEnum::class)],
             'items' => ['array'],
             'items.*.id' => ['uuid'],
@@ -50,7 +49,7 @@ class Create{Entity}Request extends AbstractRequest
 
     public function attributes(): array
     {
-        return ['title' => 'название', 'slug' => 'адрес страницы'];
+        return ['title' => 'название'];
     }
 }
 ```
@@ -59,7 +58,9 @@ class Create{Entity}Request extends AbstractRequest
 
 - `$dtoClassName` обязателен — иначе `validated()` вернёт массив.
 - Enum-поля — `Rule::enum(StatusEnum::class)`, не «магической строкой» `in:` в правилах.
-- FK — `new Exists('products', 'id')`; уникальность — `new Unique('products', 'slug')`.
+- FK — `new Exists('products', 'id')`; уникальность — `new Unique('products', 'code')`
+  для полей, которые действительно вводятся с фронта.
+- Slug не принимается из Request: он генерируется на событии модели `saving` из `name`.
 - Кастомные правила — `app/Http/Rules/`.
 - Вложенные массивы описываются полностью: невалидированные ключи отбрасываются
   (`$excludeUnvalidatedArrayKeys = true`).
@@ -75,10 +76,9 @@ class Update{Entity}Request extends Create{Entity}Request
     public function rules(): array
     {
         return [
-            ...Arr::except(parent::rules(), ['title', 'slug']),
+            ...Arr::except(parent::rules(), ['title']),
             'id' => ['required', 'uuid'],
             'title' => ['sometimes', 'string'],
-            'slug' => ['sometimes', 'string', (new Unique('products', 'slug'))->ignore($this->input('id'))],
         ];
     }
 }
@@ -95,7 +95,6 @@ class Update{Entity}Request extends Create{Entity}Request
 class Create{Entity}RequestDTO extends AbstractDto
 {
     public string $title;
-    public ?string $slug = null;
     public StatusEnum $status;
     /** @var ItemDTO[] */
     public array $items = [];
@@ -112,7 +111,8 @@ class Create{Entity}RequestDTO extends AbstractDto
 - Вложенные DTO — через `getDtoArrays()`; enum и даты приводятся автоматически.
 - Если допустимы неизвестные ключи — переопределить конструктор и вызвать
   `parent::parseData($data, false)`.
-- DTO сущности (не запроса) — `app/DTO/Models/{Entity}DTO.php`.
+- DTO сущности для отдачи на фронт не создаётся: наружу идёт `{Entity}Resource`.
+  DTO здесь — только перенос входных данных запроса.
 
 ## 5. Использование в контроллере и сервисе
 
@@ -137,8 +137,8 @@ php -l app/DTO/Request/{Entity}/Create{Entity}RequestDTO.php
 ./vendor/bin/phpstan analyse
 ```
 
-Вручную: обязательные поля, enum-значения, FK на существующие записи, уникальность slug,
-поведение при невалидированных вложенных ключах.
+Вручную: обязательные поля, enum-значения, FK на существующие записи, уникальность вводимых
+полей, отсутствие slug в правилах и DTO, поведение при невалидированных вложенных ключах.
 
 ## Частые ошибки
 

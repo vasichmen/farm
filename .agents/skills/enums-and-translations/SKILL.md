@@ -27,6 +27,17 @@ enum {Name}Enum: string
 - Значение — `snake_case`, стабильное (это контракт с БД и фронтом).
 - Значения не переименовываются без миграции данных.
 
+### Миграция
+
+- Колонка создаётся через `$table->enum('status', {Name}Enum::values())`; `values()` из
+  `BaseEnumTrait` отдаёт значения кейсов, ручной список в миграции не дублируется.
+- Laravel на PostgreSQL компилирует `enum` в `varchar + check`, отдельный тип PostgreSQL
+  не создаётся.
+- Новое значение enum — отдельная миграция: добавить кейс и перевод, затем в миграции
+  с `use EnumDBCheckAlterable;` вызвать
+  `$this->alterEnum('{table}', '{field}', {Name}Enum::values())`.
+  Трейт пакета работает на PostgreSQL; SQLite-прогон миграцию с `alterEnum()` не выполняет.
+
 ## 2. Перевод
 
 `lang/ru/enums.php`:

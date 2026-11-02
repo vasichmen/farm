@@ -8,13 +8,16 @@ description: JSON-ответ в lyk-farm — AbstractResource, getFields/getRela
 Правила: `rules.md` §5. Из JSON-контроллера не уходят модели и массивы — только Resource
 в презентере.
 
-**Где это применяется.** JSON отдают справочники (`laravel-handbooks`) и собственные
-API-эндпоинты. Страницы сайта рендерит Blade — Resource для них не создаётся.
+**Где это применяется.** На каждую сущность — ровно один Resource. JSON API, props
+Vue-островов и любые данные для фронта проходят через Resource. Страницу рендерит Blade,
+но модели в props/JSON не сериализуются напрямую. Сервисы и репозитории возвращают
+модели/`Collection` моделей; Resource применяется в контроллере или page-ресурсе.
 
 ## 1. Resource сущности
 
 `app/Http/Resources/{Entity}Resource.php`, наследник
-`Laravel\Foundation\Abstracts\AbstractResource`.
+`Laravel\Foundation\Abstracts\AbstractResource`. Для страницы из нескольких сущностей —
+`app/Http/Resources/{Page}Resource.php`, который собирается из ресурсов сущностей.
 
 ```php
 class {Entity}Resource extends AbstractResource
@@ -22,9 +25,9 @@ class {Entity}Resource extends AbstractResource
     public function toArray($request): array
     {
         return [
-            ...$this->getFields(['id', 'title', 'slug', 'sort_order']),
-            ...$this->getRelation('rSeason', SeasonResource::class),
-            ...$this->getRelation('rCategory', CategoryResource::class),
+            ...$this->getFields(['id', 'slug', 'title', 'sort_order']),
+            ...$this->getRelation('season', SeasonResource::class),
+            ...$this->getRelation('category', CategoryResource::class),
             ...$this->getEnum('status'),
             ...$this->renderTimestamps(),
         ];
@@ -54,14 +57,15 @@ class {Entity}Resource extends AbstractResource
 - Не догружать связи внутри Resource (никаких `->load()`): связи грузятся в репозитории
   через `with()`/`fromGetListDto()`.
 - Поля, которых нет в выборке, не указывать в `getFields()` — иначе пустые значения в ответе.
-- Форматирование цены и веса (₽, ₽/кг, «5 кг») — в сервисе/хелпере форматирования, не в Resource
-  и не во фронте дважды.
+- Resource отдаёт сырые значения: `price`, `price_unit`, `pack`, `status`. Вычисленные
+  `price_label`/`status_label`/`*_label` не добавляются — форматирование делает фронтенд.
 
 ## 3. Short-ресурсы
 
 - Выпадающие списки и вложенные ссылки — `app/Http/Resources/Short/{Entity}ShortResource.php`
   (`id` + отображаемое имя).
-- Вложенные DTO (не модели) — `app/Http/Resources/DTO/`.
+- Ресурсы page-DTO — `app/Http/Resources/DTO/{Page}Resource.php`; сам DTO агрегата лежит
+  в `app/DTO/{Page}DTO.php` и может содержать модели/`Collection` моделей.
 - Один Resource — одно представление; «универсальный» Resource с флагами не делать.
 
 ## 4. Презентеры

@@ -2,23 +2,19 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Season;
+use Laravel\Foundation\Abstracts\AbstractAppServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class AppServiceProvider extends AbstractAppServiceProvider
 {
     /**
-     * Register any application services.
+     * @var array<class-string>
      */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
-    }
+    protected array $modelList = [
+        Category::class,
+        Season::class,
+        Product::class,
+    ];
 }

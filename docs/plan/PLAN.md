@@ -51,11 +51,12 @@
 ## 2. Как устроен план
 
 1. **Фаза = отдельный OpenSpec change.** В `proposal.md` — зачем и что меняется, в `design.md` — решения, в `tasks.md` — проверяемые шаги. После приёмки change архивируется, спеки обновляются.
-2. **Каждая фаза заканчивается проверками** из `AGENTS.md` §10 и skill `definition-of-done`: `php -l`, `route:list`, Pint, PHPStan, ESLint, `vue-tsc`, Playwright, `composer test`.
-3. **Порядок фаз подчинён зависимостям, а не нумерации ТЗ §19.** Данные и дизайн-система нужны раньше вёрстки, поэтому они вынесены вперёд. Соответствие фазам ТЗ — в §3.
-4. **Оценки — диапазон, а не обещание.** Даты не ставим (ТЗ П2). Итог — §6.
-5. **Коммиты и пуш — только по явной просьбе** (R-0.11).
-6. **Не расширяем объём.** Новые элементы, «улучшения» и не описанные в ТЗ поверхности в фазы не попадают.
+2. **Архивация change'а = закрытие фазы.** В той же сессии, где архивируется change, обновляем этот файл: в §3 статус фазы → `✅ сделано`, в колонку «Change» — имя заархивированного change'а, в заголовке фазы §4 → `— ✅ сделано`, строка «Текущая точка» и списки §1.1/§1.2 — по факту. Пока отметки нет, фаза не закрыта, даже если `tasks.md` весь в галочках.
+3. **Каждая фаза заканчивается проверками** из `AGENTS.md` §10 и skill `definition-of-done`: `php -l`, `route:list`, Pint, PHPStan, ESLint, `vue-tsc`, Playwright, `composer test`.
+4. **Порядок фаз подчинён зависимостям, а не нумерации ТЗ §19.** Данные и дизайн-система нужны раньше вёрстки, поэтому они вынесены вперёд. Соответствие фазам ТЗ — в §3.
+5. **Оценки — диапазон, а не обещание.** Даты не ставим (ТЗ П2). Итог — §6.
+6. **Коммиты и пуш — только по явной просьбе** (R-0.11).
+7. **Не расширяем объём.** Новые элементы, «улучшения» и не описанные в ТЗ поверхности в фазы не попадают.
 
 ---
 
@@ -136,15 +137,15 @@
 2. Миграции:
    - `categories`: `slug`, `name`, `color`, `shape`, `icon`, `sort_order`;
    - `seasons`: `slug`, `name`, `sub`, `h1`, `lead`, `next_label`, `teaser_icon`, `mobile_title`, `mobile_sub`, `empty_text`, `bg_from`, `bg_to`, `sort_order`;
-   - `products`: `slug`, `name`, `story_title`, `description`, `pack`, `price`, `price_unit`, `sale_unit`, `step`, `harvest`, `facts` (jsonb), `status`, `stock`, `sort_order`, `show_on_desktop`, `show_on_wheel`, `wheel_order`, `icon`, `category_id`;
-   - `product_season` (many-to-many).
-   Индексы: `slug` unique, FK, `sort_order`, `status`.
-3. Enum'ы: `ProductStatusEnum` (`in_stock`/`few`/`preorder`/`out`), `PriceUnitEnum` (`rub`/`rub_per_kg`), `SaleUnitEnum` (`piece`/`kg`), `CategoryShapeEnum` (`circle`/`diamond`/`leaf`) + `BaseEnumTrait`. Переводы в `lang/ru/enums.php` для каждого case.
-4. Модели: `Category`, `Season`, `Product`; связи `rCategory`, `rSeasons`, `rProducts`; касты enum, `facts` → array, `step`/`price` → int/float по смыслу. Никакой логики в моделях.
+   - `products`: `slug`, `name`, `story_title`, `description`, `pack`, `price`, `price_unit`, `sale_unit`, `step`, `facts` (jsonb), `status`, `stock`, `icon`, `category_id`;
+   - `product_season`: `sort_order`, `show_on_desktop`, `show_on_wheel`, `wheel_order`, `harvest`.
+   Индексы: `slug` unique, FK, `sort_order`, `status`. Сезонные поля показа и сбора живут в pivot. Slug генерируется на событии модели, не в DTO/Request.
+3. Enum'ы: `ProductStatusEnum` (`in_stock`/`few`/`preorder`/`out`), `PriceUnitEnum` (`rub`/`rub_per_kg`), `SaleUnitEnum` (`piece`/`kg`), `CategoryShapeEnum` (`circle`/`diamond`/`leaf`) + `BaseEnumTrait`. Колонки — `$table->enum(..., Enum::values())`. Переводы в `lang/ru/enums.php` для каждого case; новое значение — миграция с `EnumDBCheckAlterable`.
+4. Модели: `Category`, `Season`, `Product`; связи `category`, `seasons`, `products`; касты enum, `facts` → array, `step`/`price` → int/float по смыслу. Slug генерируется на событии модели, не в DTO/Request. Никакой логики в моделях.
 5. Репозитории: `CategoryRepository`, `SeasonRepository`, `ProductRepository`. Выборки: сезон по slug с видимыми товарами, товар по slug (включая `out`), следующий сезон по цепочке, счётчики товаров, категории сезона. Жадная загрузка связей.
 6. DTO: `CategoryDTO`, `SeasonDTO`, `ProductDTO`, `HomePageDTO` (сезон, категория, товар, сезоны, счётчики, следующий сезон). DTO — наследники `AbstractDto`, без логики и запросов.
 7. Сервис `HomePageService`: разрешение сезона по умолчанию (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень), фильтр `status !== out` для сеток/плиток/колеса/счётчиков, товар по прямой ссылке даже при `out`, следующий сезон, число продуктов, текущий месяц для подписи. Контроллер только принимает данные и отдаёт view.
-8. Сидеры (идемпотентные, через репозитории): 3 категории, 4 сезона, товары из `docs/handoff/seasons-content.md` / `.csv` — осень 9, зима 9, весна 8, лето 9; общие товары (варенье смородиновое, иван-чай, лист смородины) — одна запись с несколькими сезонами; 9-я плитка зимы и лета — `show_on_desktop = false`; товары на колесе — `show_on_wheel` + `wheel_order`; плюс один товар `out` для проверки прямой ссылки. CSV — источник переноса, дальше правки идут в сидерах.
+8. Сидеры (идемпотентные, через репозитории): 3 категории, 4 сезона, товары из `docs/handoff/seasons-content.md` / `.csv` — осень 9, зима 9, весна 8, лето 9; общие товары (варенье смородиновое, иван-чай, лист смородины) — одна запись с несколькими сезонами; 9-я плитка зимы и лета — `show_on_desktop = false` на pivot; товары на колесе — `show_on_wheel` + `wheel_order` на pivot; плюс один товар `out` для проверки прямой ссылки. CSV — источник переноса, дальше правки идут в сидерах.
 9. Форматирование: цена «650 ₽» / «650 ₽/кг» с неразрывным пробелом в тысячах; вес «5 кг», «0,5 кг», «2–4 кг»; фасовка «ящик 5 кг», «банка 0,5 л»; склонения «1 продукт / 2 продукта / 5 продуктов»; даты «2–10 октября». Логика — в трейтах `app/Traits/Service/`, не в хелперах и не в Blade.
 10. Тесты: unit на форматирование (цена, вес, склонения, даты), feature на выдачу главной (сезон по умолчанию, фильтр `out`, 8/9 товаров, следующий сезон, пустой сезон), тест идемпотентности сидеров (повторный запуск не создаёт дублей).
 
