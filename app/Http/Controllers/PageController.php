@@ -2,19 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Request\HomePage\HomePageRequestDTO;
+use App\Http\Requests\HomePage\HomePageRequest;
+use App\Http\Resources\DTO\HomePageResource;
+use App\Services\HomePageService;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    public function home(): View
+    public function home(HomePageRequest $request): View
     {
+        /** @var HomePageRequestDTO $dto */
+        $dto = $request->validated();
+
+        $page = (new HomePageResource(HomePageService::getHomePage(
+            $dto->season,
+            $dto->product,
+            $dto->month,
+        )))->resolve();
+
         return view('pages.home', [
             'meta' => self::meta(
                 'Усадьба Лыково — фермерские продукты и сезонные прогулки',
                 'Усадьба Лыково: сезонные продукты с фермы, прогулки по хозяйству и предзаказ к сезону.',
                 'home',
             ),
+            'page' => $page,
+            'season' => $page['season']['slug'],
         ]);
     }
 

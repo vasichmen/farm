@@ -7,8 +7,9 @@
     @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
     @fonts
+    @stack('head')
 </head>
-<body data-season="autumn">
+<body data-season="{{ $season ?? 'autumn' }}">
     @include('generated.ui-sprite')
     <header class="site-header">
         <div class="container">

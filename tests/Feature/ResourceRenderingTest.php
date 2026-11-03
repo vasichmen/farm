@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Services\HomePageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ResourceRenderingTest extends TestCase
@@ -35,6 +36,13 @@ class ResourceRenderingTest extends TestCase
         $this->assertCount(9, $resource['mobile_products']);
         $this->assertSame(9, $resource['products_count']);
         $this->assertCount(4, $resource['seasons']);
+
+        $seasonProductsCounts = collect($resource['seasons'])->pluck('products_count', 'slug');
+
+        $this->assertSame(9, $seasonProductsCounts['autumn']);
+        $this->assertSame(9, $seasonProductsCounts['winter']);
+        $this->assertSame(8, $seasonProductsCounts['spring']);
+        $this->assertSame(9, $seasonProductsCounts['summer']);
 
         $antonovka = $resource['desktop_products'][0];
 
@@ -63,6 +71,43 @@ class ResourceRenderingTest extends TestCase
             $resource['products_count'],
             collect($resource['categories'])->sum('products_count'),
         );
+    }
+
+    public function test_home_page_resource_renders_wheel_section(): void
+    {
+        $resource = (new HomePageResource(HomePageService::getHomePage('autumn')))->resolve();
+
+        $wheel = $resource['wheel'];
+
+        $this->assertSame('autumn', $wheel['active_season']);
+        $this->assertCount(4, $wheel['seasons']);
+        $this->assertSame(
+            ['summer', 'autumn', 'winter', 'spring'],
+            collect($wheel['seasons'])->pluck('slug')->all(),
+        );
+        $this->assertSame(
+            ['summer', 'autumn', 'winter', 'spring'],
+            collect($wheel['seasons'])->pluck('slug')->unique()->values()->all(),
+        );
+
+        foreach ($wheel['seasons'] as $season) {
+            $this->assertLessThanOrEqual(7, Str::length($season['sub']), $season['slug']);
+            $this->assertGreaterThanOrEqual(0, $season['products_count'], $season['slug']);
+            $this->assertStringContainsString('/?season='.$season['slug'], $season['url']);
+
+            foreach ($season['products'] as $product) {
+                $this->assertNotSame('', $product['name']);
+                $this->assertStringStartsWith('product-', $product['icon']);
+            }
+        }
+
+        $autumn = collect($wheel['seasons'])->firstWhere('slug', 'autumn');
+
+        $this->assertIsArray($autumn);
+        $this->assertSame('Осень', $autumn['name']);
+        $this->assertSame('УРОЖАЙ', $autumn['sub']);
+        $this->assertSame(9, $autumn['products_count']);
+        $this->assertCount(4, $autumn['products']);
     }
 
     public function test_direct_product_resource_includes_out_status(): void

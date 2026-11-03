@@ -59,6 +59,10 @@ class HomePageService extends AbstractService
             static fn (Collection $products): Collection => self::buildWheelProducts($products),
         );
 
+        $seasonProductsCounts = $seasonProducts->map(
+            static fn (Collection $products): int => $products->count(),
+        );
+
         $activeIndex = (int) $seasons->search(
             static fn (Season $season): bool => $season->id === $activeSeason->id,
         );
@@ -85,6 +89,7 @@ class HomePageService extends AbstractService
             productsCount: $activeProducts->count(),
             categoryCounts: $activeProducts->countBy('category_id'),
             wheelProductsBySeason: $wheelProductsBySeason,
+            seasonProductsCounts: $seasonProductsCounts,
         );
     }
 

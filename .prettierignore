@@ -12,6 +12,7 @@ package-lock.json
 composer.lock
 resources/css/tokens.css
 resources/assets
+resources/js/generated
 docs
 openspec
 .agents

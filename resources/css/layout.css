@@ -54,6 +54,13 @@ body[data-season='summer'] {
     column-gap: var(--col-gap);
 }
 
+/* Ниже 1200 px колесо и колонка не стоят рядом: остаётся обычный поток. */
+@media (max-width: 1199px) {
+    .desktop-grid {
+        display: block;
+    }
+}
+
 .card-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

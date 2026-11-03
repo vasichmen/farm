@@ -5,6 +5,7 @@ import { assertCount, cleanSvg, writeFileEnsured } from './lib/svg.mjs';
 /**
  * Собирает из очищенных resources/assets:
  * - 29 Blade-партиалов товарных иконок с inline <svg>;
+ * - JSON-модуль с внутренностями тех же иконок для Vue-острова колеса;
  * - один спрайт UI-иконок (35 <symbol>);
  * - контурные логотипы и favicon-набор в public/.
  *
@@ -14,6 +15,7 @@ import { assertCount, cleanSvg, writeFileEnsured } from './lib/svg.mjs';
 const projectRoot = process.cwd();
 const assetsDir = path.join(projectRoot, 'resources', 'assets');
 const generatedDir = path.join(projectRoot, 'resources', 'views', 'generated');
+const generatedJsDir = path.join(projectRoot, 'resources', 'js', 'generated');
 const publicDir = path.join(projectRoot, 'public');
 
 const PRODUCTS_COUNT = 29;
@@ -59,6 +61,8 @@ async function buildProductIcons() {
     assertCount('Товарные иконки', names, PRODUCTS_COUNT);
     await rm(targetDir, { recursive: true, force: true });
 
+    const iconModule = {};
+
     for (const name of names) {
         const svg = await cleanSvg(path.join(sourceDir, name));
         const { attributes, inner } = splitSvg(svg);
@@ -75,7 +79,14 @@ async function buildProductIcons() {
 
         assertClean(`product-icons/${name}`, partial);
         await writeFileEnsured(path.join(targetDir, name.replace(/\.svg$/, '.blade.php')), partial);
+
+        iconModule[name.replace(/^product-/, '').replace(/\.svg$/, '')] = inner;
     }
+
+    const iconModuleContent = `${JSON.stringify(iconModule, null, 2)}\n`;
+
+    assertClean('generated/product-icons.json', iconModuleContent);
+    await writeFileEnsured(path.join(generatedJsDir, 'product-icons.json'), iconModuleContent);
 
     return names;
 }
@@ -179,7 +190,7 @@ async function main() {
     const favicon = await buildFavicon();
 
     console.log(
-        `Готово: ${products.length} партиалов, ${uiIcons.length} символов спрайта, ` +
+        `Готово: ${products.length} партиалов и записей JSON, ${uiIcons.length} символов спрайта, ` +
             `${logos.length} логотипа, ${favicon.length} файлов favicon.`,
     );
 }

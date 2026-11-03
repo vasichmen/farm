@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class BrandComponentsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_all_product_icons_render_inline_svg(): void
     {
         $files = File::files(resource_path('views/generated/product-icons'));
@@ -58,6 +61,8 @@ class BrandComponentsTest extends TestCase
 
     public function test_page_includes_ui_sprite_once(): void
     {
+        $this->seed();
+
         $content = $this->get(route('home'))->assertOk()->getContent();
 
         $this->assertSame(1, substr_count($content, 'data-ui-sprite'));

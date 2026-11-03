@@ -14,6 +14,8 @@ class SeasonResource extends AbstractResource
     /** @var Collection<int, Product>|null */
     private ?Collection $wheelProducts = null;
 
+    private int $productsCount = 0;
+
     public function __construct(Season $season)
     {
         parent::__construct($season);
@@ -27,6 +29,13 @@ class SeasonResource extends AbstractResource
     public function withWheelProducts(Collection $wheelProducts): static
     {
         $this->wheelProducts = $wheelProducts;
+
+        return $this;
+    }
+
+    public function withProductsCount(int $productsCount): static
+    {
+        $this->productsCount = $productsCount;
 
         return $this;
     }
@@ -55,6 +64,7 @@ class SeasonResource extends AbstractResource
         return [
             ...$fields,
             'sort_order' => (int) $this->season->sort_order,
+            'products_count' => $this->productsCount,
             'wheel_products' => ProductResource::collection($this->wheelProducts ?? collect())->resolve(),
             ...$this->renderTimestamps(),
         ];

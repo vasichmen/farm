@@ -7,11 +7,18 @@ use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\SeasonResource;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Season;
+use Illuminate\Support\Str;
 use Laravel\Foundation\Abstracts\AbstractResource;
 
 class HomePageResource extends AbstractResource
 {
+    /**
+     * Порядок сезонов по часовой стрелке на колесе: лето → осень → зима → весна.
+     */
+    private const WHEEL_ORDER = ['summer', 'autumn', 'winter', 'spring'];
+
     private HomePageDTO $data;
 
     public function __construct(HomePageDTO $data)
@@ -50,6 +57,37 @@ class HomePageResource extends AbstractResource
                 ? $this->renderSeason($this->data->fallbackSeason)
                 : null,
             'products_count' => $this->data->productsCount,
+            'wheel' => [
+                'active_season' => $this->data->season->slug,
+                'seasons' => $this->data->seasons
+                    ->sortBy(fn (Season $season): int => (int) collect(self::WHEEL_ORDER)
+                        ->search($season->slug))
+                    ->values()
+                    ->map(fn (Season $season): array => $this->renderWheelSeason($season))
+                    ->all(),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function renderWheelSeason(Season $season): array
+    {
+        return [
+            'slug' => $season->slug,
+            'name' => $season->name,
+            'sub' => $season->sub,
+            'url' => Str::finish(route('home'), '/').'?season='.$season->slug,
+            'products_count' => $this->data->seasonProductsCounts->get($season->id, 0),
+            'products' => $this->data->wheelProductsBySeason
+                ->get($season->id, collect())
+                ->map(static fn (Product $product): array => [
+                    'name' => $product->name,
+                    'icon' => $product->icon,
+                ])
+                ->values()
+                ->all(),
         ];
     }
 
@@ -60,6 +98,7 @@ class HomePageResource extends AbstractResource
     {
         return (new SeasonResource($season))
             ->withWheelProducts($this->data->wheelProductsBySeason->get($season->id, collect()))
+            ->withProductsCount($this->data->seasonProductsCounts->get($season->id, 0))
             ->resolve();
     }
 }

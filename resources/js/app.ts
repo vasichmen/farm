@@ -1,8 +1,18 @@
 import { createApp, type Component } from 'vue';
-import ScaffoldProbe from '@/islands/ScaffoldProbe.vue';
+import type { ZodType } from 'zod';
+import SeasonWheel from '@/islands/SeasonWheel.vue';
+import { seasonWheelSchema } from '@/types/season-wheel';
 
-const islands: Record<string, Component> = {
-    'scaffold-probe': ScaffoldProbe,
+interface IslandDefinition {
+    component: Component;
+    schema?: ZodType;
+}
+
+const islands: Record<string, IslandDefinition> = {
+    'season-wheel': {
+        component: SeasonWheel,
+        schema: seasonWheelSchema,
+    },
 };
 
 function readProps(element: HTMLElement): Record<string, unknown> | null {
@@ -45,9 +55,9 @@ function mountIslands(): void {
             return;
         }
 
-        const component = islands[name];
+        const definition = islands[name];
 
-        if (component === undefined) {
+        if (definition === undefined) {
             console.warn(`[islands] Остров "${name}" не зарегистрирован.`);
 
             return;
@@ -59,8 +69,21 @@ function mountIslands(): void {
             return;
         }
 
+        const parsed = definition.schema?.safeParse(props) ?? {
+            success: true as const,
+            data: props,
+        };
+
+        if (!parsed.success) {
+            console.error(`[islands] Данные острова "${name}" не прошли проверку.`, parsed.error);
+
+            return;
+        }
+
         try {
-            createApp(component, props).mount(element);
+            const rootProps = { data: parsed.data };
+
+            createApp(definition.component, rootProps).mount(element);
         } catch (error) {
             console.error(`[islands] Не удалось смонтировать остров "${name}".`, error);
         }

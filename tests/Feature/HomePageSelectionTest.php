@@ -173,6 +173,23 @@ class HomePageSelectionTest extends TestCase
         $this->assertSame('Весна', $homePage->fallbackSeason?->name);
     }
 
+    public function test_season_products_counts_match_visible_products(): void
+    {
+        $this->seed();
+
+        $homePage = HomePageService::getHomePage('autumn');
+
+        foreach ($homePage->seasons as $season) {
+            $this->assertSame(
+                $homePage->seasonProductsCounts->get($season->id),
+                $season->products->count(),
+                $season->slug,
+            );
+        }
+
+        $this->assertSame(9, $homePage->seasonProductsCounts->get($homePage->season->id));
+    }
+
     public function test_category_counters_sum_to_season_products_count(): void
     {
         $this->seed();

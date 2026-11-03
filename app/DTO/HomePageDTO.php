@@ -18,6 +18,7 @@ class HomePageDTO extends AbstractDto
      * @param  Collection<int, Season>  $seasons
      * @param  Collection<string, int>  $categoryCounts
      * @param  Collection<string, Collection<int, Product>>  $wheelProductsBySeason
+     * @param  Collection<string, int<0, max>>  $seasonProductsCounts
      */
     public function __construct(
         public Season $season,
@@ -32,6 +33,7 @@ class HomePageDTO extends AbstractDto
         public int $productsCount,
         public Collection $categoryCounts,
         public Collection $wheelProductsBySeason,
+        public Collection $seasonProductsCounts,
     ) {
         parent::__construct([]);
     }
