@@ -1,0 +1,345 @@
+/* Меню сайта: остров site-menu. Панель постоянно в DOM и скрыта до открытия. */
+
+html.site-menu-open,
+html.site-menu-open body {
+    overflow: hidden;
+}
+
+.site-menu {
+    position: relative;
+    z-index: var(--z-menu);
+}
+
+.site-menu__toggle {
+    position: relative;
+    z-index: calc(var(--z-menu) + 2);
+    display: grid;
+    place-items: center;
+    width: var(--size-header-btn-desktop);
+    height: var(--size-header-btn-desktop);
+    padding: 0;
+    color: var(--color-parchment);
+    cursor: pointer;
+    background: transparent;
+    border: var(--border-hairline) solid var(--color-line-on-dark);
+    border-radius: var(--radius-circle);
+    transition:
+        border-color var(--dur-fast) var(--ease-standard),
+        background var(--dur-fast) var(--ease-standard),
+        transform var(--dur-fast) var(--ease-standard);
+}
+
+.site-menu__toggle:hover {
+    background: rgba(243, 235, 219, 0.1);
+    border-color: var(--color-honey);
+}
+
+.site-menu__toggle:active {
+    transform: scale(0.94);
+}
+
+.site-menu__toggle:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus-on-dark);
+    outline-offset: var(--focus-offset);
+}
+
+.site-menu__burger {
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 14px;
+}
+
+.site-menu__burger span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.8px;
+    background: currentColor;
+    border-radius: 1px;
+    transition:
+        transform var(--dur-base) var(--ease-standard),
+        opacity var(--dur-base) var(--ease-standard);
+}
+
+.site-menu__burger span:nth-child(1) {
+    top: 0;
+}
+
+.site-menu__burger span:nth-child(2) {
+    top: 6.1px;
+}
+
+.site-menu__burger span:nth-child(3) {
+    top: 12.2px;
+}
+
+.site-menu.is-open .site-menu__burger span:nth-child(1) {
+    transform: translateY(6.1px) rotate(45deg);
+}
+
+.site-menu.is-open .site-menu__burger span:nth-child(2) {
+    opacity: 0;
+}
+
+.site-menu.is-open .site-menu__burger span:nth-child(3) {
+    transform: translateY(-6.1px) rotate(-45deg);
+}
+
+.site-menu__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    pointer-events: none;
+    visibility: hidden;
+    background: var(--color-overlay);
+    opacity: 0;
+    transition:
+        opacity var(--dur-base) var(--ease-exit),
+        visibility 0s linear var(--dur-base);
+}
+
+.site-menu.is-open .site-menu__overlay {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+    transition:
+        opacity var(--dur-slow) var(--ease-standard),
+        visibility 0s;
+}
+
+.site-menu__panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-menu);
+    display: flex;
+    flex-direction: column;
+    width: var(--size-menu-panel-width);
+    max-width: 100vw;
+    padding: 112px var(--space-40) var(--space-32);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--color-parchment);
+    pointer-events: none;
+    visibility: hidden;
+    background: var(--color-forest);
+    box-shadow: var(--shadow-menu-panel);
+    opacity: 0;
+    transform: translateX(-100%);
+    touch-action: pan-y;
+    transition:
+        transform var(--dur-base) var(--ease-exit),
+        opacity var(--dur-base) var(--ease-exit),
+        visibility 0s linear var(--dur-base);
+}
+
+.site-menu.is-open .site-menu__panel {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition:
+        transform var(--dur-slow) var(--ease-standard),
+        opacity var(--dur-slow) var(--ease-standard),
+        visibility 0s;
+}
+
+.site-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.site-menu__item {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity 0ms,
+        transform 0ms;
+}
+
+.site-menu.is-open .site-menu__item {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity var(--dur-slow) var(--ease-standard),
+        transform var(--dur-slow) var(--ease-standard);
+    transition-delay: calc(var(--item-index) * var(--dur-menu-item));
+}
+
+.site-menu__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-6) 0 var(--space-6) var(--space-32);
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--color-parchment);
+    text-decoration: none;
+    transition:
+        color var(--dur-fast) var(--ease-standard),
+        transform var(--dur-fast) var(--ease-standard);
+}
+
+.site-menu__link:hover {
+    color: var(--color-honey);
+    transform: translateX(8px);
+}
+
+.site-menu__link[aria-current='page']::before {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    content: '';
+    background: var(--color-honey);
+    border-radius: var(--radius-circle);
+    transform: translateY(-50%);
+}
+
+.site-menu__footer {
+    padding-top: var(--space-20);
+    margin-top: auto;
+    border-top: var(--border-hairline) solid var(--color-line-on-dark);
+}
+
+.site-menu__footer-inner {
+    display: flex;
+    gap: var(--space-16);
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.site-menu__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-style: normal;
+    line-height: 1.45;
+    color: var(--color-parchment);
+}
+
+.site-menu__contacts a {
+    color: var(--color-parchment);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.site-menu__contacts a:hover {
+    color: var(--color-honey);
+}
+
+.site-menu__socials {
+    display: flex;
+    gap: var(--space-8);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.site-menu__social {
+    display: grid;
+    place-items: center;
+    width: var(--size-tap-min);
+    height: var(--size-tap-min);
+    color: var(--color-parchment);
+    text-decoration: none;
+    border: var(--border-hairline) solid var(--color-line-on-dark);
+    border-radius: var(--radius-circle);
+    transition:
+        color var(--dur-fast) var(--ease-standard),
+        border-color var(--dur-fast) var(--ease-standard);
+}
+
+.site-menu__social:hover {
+    color: var(--color-honey);
+    border-color: var(--color-honey);
+}
+
+.site-menu__social[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.site-menu__social[aria-disabled='true']:hover {
+    color: var(--color-parchment);
+    border-color: var(--color-line-on-dark);
+}
+
+.site-menu__social-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Серверный fallback: список ссылок виден только без JavaScript. */
+.site-menu__fallback-list {
+    position: absolute;
+    top: calc(100% + var(--space-8));
+    left: 0;
+    z-index: var(--z-menu);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    min-width: 220px;
+    padding: var(--space-16);
+    margin: 0;
+    list-style: none;
+    background: var(--color-forest);
+    border: var(--border-hairline) solid var(--color-line-on-dark);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-dropdown);
+}
+
+.site-menu__fallback-list a {
+    color: var(--color-parchment);
+    text-decoration: none;
+}
+
+.site-menu__fallback-list a[aria-current='page'] {
+    color: var(--color-honey);
+}
+
+/* Телефон: меню на весь экран цветом Forest, въезд сверху на 16 px. */
+@media (max-width: 1199px) {
+    .site-menu__toggle {
+        width: var(--size-header-btn-mobile);
+        height: var(--size-header-btn-mobile);
+    }
+
+    .site-menu__panel {
+        width: 100%;
+        padding: 92px var(--space-20) var(--space-24);
+        transform: translateY(-16px);
+    }
+
+    .site-menu.is-open .site-menu__panel {
+        transform: none;
+    }
+
+    .site-menu__link {
+        font-size: 44px;
+    }
+
+    .site-menu.is-open .site-menu__overlay {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Глобальное правило оставляет только opacity 150 ms; visibility
+       не должна обрывать затухание, поэтому слой остаётся видимым. */
+    .site-menu__panel,
+    .site-menu__overlay {
+        visibility: visible !important;
+    }
+}

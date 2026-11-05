@@ -165,6 +165,7 @@
   --dur-wheel: 700ms;
   --dur-stagger: 60ms;
   --dur-stagger-mobile: 40ms;
+  --dur-menu-item: 50ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);

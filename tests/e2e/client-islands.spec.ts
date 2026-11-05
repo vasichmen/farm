@@ -148,18 +148,22 @@ test('данные, не прошедшие проверку схемой, ос�
         const response = await route.fetch();
         const body = await response.text();
         const props = JSON.parse(
-            body.match(/data-props='([^']+)'/)?.[1].replace(/&#039;/g, "'") ?? '{}',
+            body
+                .match(/data-island="season-wheel"[^>]*data-props='([^']+)'/s)?.[1]
+                .replace(/&#039;/g, "'") ?? '{}',
         );
 
         props.seasons = props.seasons.map((season: { slug: string; sub: string }) =>
             season.slug === 'winter' ? { ...season, sub: 'СЛИШКОМ ДЛИННО' } : season,
         );
 
+        const serialized = JSON.stringify(props).replace(/'/g, '&#039;');
+
         await route.fulfill({
             response,
             body: body.replace(
-                /data-props='[^']+'/,
-                `data-props='${JSON.stringify(props).replace(/'/g, '&#039;')}'`,
+                /(data-island="season-wheel"[^>]*data-props=')[^']+'/s,
+                `$1${serialized}'`,
             ),
         });
     });

@@ -3,6 +3,16 @@ import { defineComponent, type PropType } from 'vue';
 import productIcons from '@/generated/product-icons.json';
 import { formatPrice } from '@/lib/format-price';
 import {
+    clearInert,
+    createScrollLock,
+    cssDuration,
+    cssEasing,
+    prefersReducedMotion,
+    setInert,
+    trapFocus as trapFocusWithin,
+    type ScrollLock,
+} from '@/lib/layer';
+import {
     type ProductModalProduct,
     type ProductModalProps,
     type ProductStatusId,
@@ -41,8 +51,7 @@ export default defineComponent({
             sourceRect: null as DOMRect | null,
             desktopQuery: null as MediaQueryList | null,
             inertElements: [] as HTMLElement[],
-            scrollLocked: false,
-            savedPaddingRight: '',
+            scrollLock: null as ScrollLock | null,
             titleId: MODAL_TITLE_ID,
             descriptionId: MODAL_DESCRIPTION_ID,
         };
@@ -278,11 +287,9 @@ export default defineComponent({
 
             const panel = this.panelElement();
             const overlay = this.overlayElement();
-            const reduced = this.prefersReducedMotion();
-            const duration = reduced
-                ? REDUCED_MOTION_DURATION
-                : this.cssDuration('--dur-base', 250);
-            const easing = reduced ? 'ease-in' : this.cssEasing('--ease-exit', 'ease-in');
+            const reduced = prefersReducedMotion();
+            const duration = reduced ? REDUCED_MOTION_DURATION : cssDuration('--dur-base', 250);
+            const easing = reduced ? 'ease-in' : cssEasing('--ease-exit', 'ease-in');
             const animations: Animation[] = [];
 
             if (panel !== null) {
@@ -352,13 +359,11 @@ export default defineComponent({
         animateOpen(): void {
             const panel = this.panelElement();
             const overlay = this.overlayElement();
-            const reduced = this.prefersReducedMotion();
-            const duration = reduced
-                ? REDUCED_MOTION_DURATION
-                : this.cssDuration('--dur-slow', 400);
+            const reduced = prefersReducedMotion();
+            const duration = reduced ? REDUCED_MOTION_DURATION : cssDuration('--dur-slow', 400);
             const easing = reduced
                 ? 'ease-out'
-                : this.cssEasing('--ease-standard', 'cubic-bezier(0.2, 0, 0, 1)');
+                : cssEasing('--ease-standard', 'cubic-bezier(0.2, 0, 0, 1)');
 
             if (panel !== null) {
                 if (reduced) {
@@ -412,49 +417,8 @@ export default defineComponent({
 
             this.hasOverflow = body.scrollHeight - body.clientHeight > 1;
         },
-        focusableElements(): HTMLElement[] {
-            const panel = this.panelElement();
-
-            if (panel === null) {
-                return [];
-            }
-
-            return Array.from(
-                panel.querySelectorAll<HTMLElement>(
-                    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-                ),
-            ).filter((element) => element.getBoundingClientRect().width > 0);
-        },
         trapFocus(event: KeyboardEvent): void {
-            const focusable = this.focusableElements();
-
-            if (focusable.length === 0) {
-                event.preventDefault();
-
-                return;
-            }
-
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            const active = document.activeElement;
-
-            if (first === undefined || last === undefined) {
-                return;
-            }
-
-            if (event.shiftKey) {
-                if (active === first || active === null || !this.panelElement()?.contains(active)) {
-                    event.preventDefault();
-                    last.focus();
-                }
-
-                return;
-            }
-
-            if (active === last || active === null || !this.panelElement()?.contains(active)) {
-                event.preventDefault();
-                first.focus();
-            }
+            trapFocusWithin(this.panelElement(), event);
         },
         onDocumentClick(event: MouseEvent): void {
             if (
@@ -594,71 +558,19 @@ export default defineComponent({
             }
         },
         lockScroll(): void {
-            if (this.scrollLocked) {
-                return;
-            }
-
-            const html = document.documentElement;
-            const scrollbarWidth = window.innerWidth - html.clientWidth;
-
-            this.savedPaddingRight = html.style.paddingRight;
-
-            if (scrollbarWidth > 0) {
-                html.style.paddingRight = `${scrollbarWidth}px`;
-            }
-
-            html.classList.add('product-modal-open');
-            this.scrollLocked = true;
+            this.scrollLock ??= createScrollLock('product-modal-open');
+            this.scrollLock.lock();
         },
         unlockScroll(): void {
-            if (!this.scrollLocked) {
-                return;
-            }
-
-            const html = document.documentElement;
-
-            html.classList.remove('product-modal-open');
-            html.style.paddingRight = this.savedPaddingRight;
-            this.scrollLocked = false;
+            this.scrollLock?.unlock();
         },
         applyInert(): void {
             this.removeInert();
-
-            document
-                .querySelectorAll<HTMLElement>('header.site-header, main.site-main')
-                .forEach((element) => {
-                    element.setAttribute('inert', '');
-                    this.inertElements.push(element);
-                });
+            this.inertElements = setInert(['header.site-header', 'main.site-main']);
         },
         removeInert(): void {
-            this.inertElements.forEach((element) => element.removeAttribute('inert'));
+            clearInert(this.inertElements);
             this.inertElements = [];
-        },
-        prefersReducedMotion(): boolean {
-            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        },
-        cssDuration(name: string, fallback: number): number {
-            const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-            if (raw.endsWith('ms')) {
-                const value = Number.parseFloat(raw);
-
-                return Number.isFinite(value) ? value : fallback;
-            }
-
-            if (raw.endsWith('s')) {
-                const value = Number.parseFloat(raw);
-
-                return Number.isFinite(value) ? value * 1000 : fallback;
-            }
-
-            return fallback;
-        },
-        cssEasing(name: string, fallback: string): string {
-            const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-            return raw === '' ? fallback : raw;
         },
     },
 });

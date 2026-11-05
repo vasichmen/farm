@@ -3,10 +3,12 @@ import type { ZodType } from 'zod';
 import CatalogCarousel from '@/islands/CatalogCarousel.vue';
 import ProductModal from '@/islands/ProductModal.vue';
 import SeasonWheel from '@/islands/SeasonWheel.vue';
+import SiteMenu from '@/islands/SiteMenu.vue';
 import { initSeasonNavigation } from '@/lib/season-navigation';
 import { catalogCarouselSchema } from '@/types/catalog-carousel';
 import { productModalSchema } from '@/types/product-modal';
 import { seasonWheelSchema } from '@/types/season-wheel';
+import { siteMenuSchema } from '@/types/site-menu';
 
 interface IslandDefinition {
     component: Component;
@@ -25,6 +27,10 @@ const islands: Record<string, IslandDefinition> = {
     'product-modal': {
         component: ProductModal,
         schema: productModalSchema,
+    },
+    'site-menu': {
+        component: SiteMenu,
+        schema: siteMenuSchema,
     },
 };
 

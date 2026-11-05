@@ -1,0 +1,61 @@
+.page-placeholder {
+    max-width: 46rem;
+    padding-block: clamp(24px, 8vh, 96px);
+}
+
+.page-placeholder__title {
+    margin-bottom: var(--space-20);
+    font-family: var(--font-display);
+    font-size: clamp(38px, 5.6vw, 64px);
+    font-weight: 600;
+    line-height: 1.04;
+    color: var(--color-parchment);
+}
+
+.page-placeholder__text {
+    max-width: 38rem;
+    margin-bottom: var(--space-32);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-parchment);
+    opacity: var(--opacity-secondary-on-dark);
+}
+
+.site-main .page-placeholder__back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-ink);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    background: var(--color-antique-gold);
+    border-radius: var(--radius-button);
+    transition: background var(--dur-fast) var(--ease-standard);
+}
+
+.site-main .page-placeholder__back:hover {
+    color: var(--color-ink);
+    background: var(--color-gold-pressed);
+}
+
+.page-placeholder__back:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus-on-dark);
+    outline-offset: var(--focus-offset);
+}
+
+@media (max-width: 1199px) {
+    .page-placeholder {
+        padding-block: var(--space-16) var(--space-32);
+    }
+
+    .page-placeholder__title {
+        font-size: 40px;
+    }
+}

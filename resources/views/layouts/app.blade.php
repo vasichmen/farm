@@ -11,17 +11,7 @@
 </head>
 <body data-season="{{ $season ?? 'autumn' }}">
     @include('generated.ui-sprite')
-    <header class="site-header">
-        <div class="container">
-            <nav class="site-nav" aria-label="Основная навигация">
-                <a href="{{ route('home') }}">Главная</a>
-                <a href="{{ route('about') }}">О хозяйстве</a>
-                <a href="{{ route('preorder') }}">Предзаказ</a>
-                <a href="{{ route('how-to-order') }}">Как оформить заказ</a>
-                <a href="{{ route('contacts') }}">Контакты</a>
-            </nav>
-        </div>
-    </header>
+    @include('partials.site-header')
 
     <main class="site-main">
         <div class="container">

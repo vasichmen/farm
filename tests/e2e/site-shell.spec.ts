@@ -6,9 +6,9 @@ const homeLead = 'Мы не держим склад: что созрело, то
 
 const pages = [
     { path: homePath, heading: homeHeading },
-    { path: '/about', heading: 'О хозяйстве' },
+    { path: '/about', heading: 'О семье' },
     { path: '/preorder', heading: 'Предзаказ' },
-    { path: '/how-to-order', heading: 'Как оформить заказ' },
+    { path: '/how-to-order', heading: 'Как заказать' },
     { path: '/contacts', heading: 'Контакты' },
 ];
 
@@ -62,7 +62,12 @@ test('страницы-заглушки содержат ссылку возвр
     for (const item of pages.filter((page) => page.path !== homePath)) {
         await page.goto(item.path);
 
-        await expect(page.locator('a[href="/"]')).toHaveCount(1);
+        const back = page.locator('main .page-placeholder a.page-placeholder__back');
+        await expect(back).toHaveCount(1);
+        await expect(back).toHaveText('Назад');
+
+        const href = await back.getAttribute('href');
+        expect(new URL(href ?? '', 'http://localhost').pathname).toBe('/');
     }
 });
 
@@ -77,8 +82,8 @@ test('неизвестный адрес возвращает 404 с HTML-стр�
 test('ссылки навигации ведут на существующие страницы', async ({ page, request }) => {
     await page.goto(homePath);
 
-    const links = page.locator('header.site-header a');
-    await expect(links).toHaveCount(5);
+    const links = page.locator('header.site-header .site-nav a');
+    await expect(links).toHaveCount(3);
 
     const hrefs = await links.evaluateAll((elements) =>
         elements.map((element) => element.getAttribute('href')),
