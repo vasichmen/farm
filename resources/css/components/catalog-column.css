@@ -33,6 +33,7 @@
 
 /* Карточка */
 .catalog-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: clamp(12px, 1.8vh, 16px) var(--space-8) var(--space-10);
@@ -40,6 +41,18 @@
     text-align: center;
     background: var(--color-parchment);
     border-radius: var(--radius-card-arch-desktop);
+}
+
+/* Ссылка-оверлей: вся карточка кликабельна, ссылка повторяет её форму. */
+.catalog-card__link {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+.catalog-card__link:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus-on-dark);
+    outline-offset: var(--focus-offset-card);
 }
 
 .catalog-card__pic {

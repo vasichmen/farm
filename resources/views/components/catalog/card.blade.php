@@ -10,6 +10,9 @@
         ->replaceFirst('product-', '')
         ->replaceLast('.svg', '')
         ->value();
+    $slug = (string) data_get($product, 'slug', '');
+    $name = (string) data_get($product, 'name', '');
+    $href = request()->fullUrlWithQuery(['product' => $slug]);
 @endphp
 
 <li
@@ -34,4 +37,13 @@
 
         <x-catalog.status :status="data_get($product, 'status')" :stock="data_get($product, 'stock')" />
     </div>
+
+    <a
+        class="catalog-card__link"
+        href="{{ $href }}"
+        aria-label="Открыть товар «{{ $name }}»"
+        aria-haspopup="dialog"
+        data-product-modal
+        data-product-slug="{{ $slug }}"
+    ></a>
 </li>

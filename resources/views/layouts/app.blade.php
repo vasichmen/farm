@@ -28,5 +28,7 @@
             @yield('content')
         </div>
     </main>
+
+    @stack('overlays')
 </body>
 </html>

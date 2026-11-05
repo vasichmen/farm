@@ -1,9 +1,11 @@
 import { createApp, type Component } from 'vue';
 import type { ZodType } from 'zod';
 import CatalogCarousel from '@/islands/CatalogCarousel.vue';
+import ProductModal from '@/islands/ProductModal.vue';
 import SeasonWheel from '@/islands/SeasonWheel.vue';
 import { initSeasonNavigation } from '@/lib/season-navigation';
 import { catalogCarouselSchema } from '@/types/catalog-carousel';
+import { productModalSchema } from '@/types/product-modal';
 import { seasonWheelSchema } from '@/types/season-wheel';
 
 interface IslandDefinition {
@@ -19,6 +21,10 @@ const islands: Record<string, IslandDefinition> = {
     'catalog-carousel': {
         component: CatalogCarousel,
         schema: catalogCarouselSchema,
+    },
+    'product-modal': {
+        component: ProductModal,
+        schema: productModalSchema,
     },
 };
 

@@ -74,6 +74,57 @@ class HomePageHttpTest extends TestCase
         }
     }
 
+    public function test_product_modal_receives_initial_product_for_direct_link(): void
+    {
+        $response = $this->get('/?season=autumn&product=antonovka');
+        $content = $response->getContent();
+
+        $response->assertOk();
+        $this->assertIsString($content);
+        $response->assertSee('data-island="product-modal"', false);
+
+        $modalPosition = strpos($content, 'data-island="product-modal"');
+        $mainEnd = strpos($content, '</main>');
+
+        $this->assertIsInt($modalPosition);
+        $this->assertIsInt($mainEnd);
+        $this->assertGreaterThan($mainEnd, $modalPosition);
+
+        $props = $this->productModalProps($content);
+
+        $this->assertSame('antonovka', $props['initial_product']['slug']);
+        $this->assertSame('in_stock', $props['initial_product']['status']['id']);
+        $this->assertCount(8, $props['products']);
+        $this->assertSame(route('preorder'), $props['preorder_url']);
+    }
+
+    public function test_product_modal_receives_out_product_by_direct_link(): void
+    {
+        $response = $this->get('/?season=autumn&product=kartofel');
+        $content = $response->getContent();
+
+        $response->assertOk();
+        $this->assertIsString($content);
+
+        $props = $this->productModalProps($content);
+
+        $this->assertSame('kartofel', $props['initial_product']['slug']);
+        $this->assertSame('out', $props['initial_product']['status']['id']);
+    }
+
+    public function test_product_modal_has_no_initial_product_for_unknown_slug(): void
+    {
+        $response = $this->get('/?season=autumn&product=unknown-product');
+        $content = $response->getContent();
+
+        $response->assertOk();
+        $this->assertIsString($content);
+
+        $props = $this->productModalProps($content);
+
+        $this->assertNull($props['initial_product']);
+    }
+
     public function test_home_page_fallback_lists_all_seasons(): void
     {
         $response = $this->get('/?season=autumn');
@@ -139,5 +190,25 @@ class HomePageHttpTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('data-season="spring"', false);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function productModalProps(string $content): array
+    {
+        $matched = preg_match(
+            '/data-island="product-modal"\s+data-props=\'(.*?)\'/s',
+            $content,
+            $matches,
+        );
+
+        $this->assertSame(1, $matched, 'Контейнер окна товара не найден.');
+        $this->assertArrayHasKey(1, $matches);
+
+        /** @var array<string, mixed> $props */
+        $props = json_decode($matches[1], true, flags: JSON_THROW_ON_ERROR);
+
+        return $props;
     }
 }

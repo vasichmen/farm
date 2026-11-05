@@ -1,0 +1,48 @@
+# Tasks
+
+## 1. Серверная точка входа и feature-тесты
+
+- [x] 1.1 Добавить `@stack('overlays')` после `</main>` в `resources/views/layouts/app.blade.php`, создать `resources/views/components/product-modal.blade.php` с пустым контейнером `data-island="product-modal"` и пропсами `products` из `desktop_products`, `initial_product` из `product`, `preorder_url` из `route('preorder')`, вывести `x-product-modal` в стек overlays на главной. Проверка: `GET /?season=autumn&product=antonovka` отдаёт контейнер после `</main>` с непустым `initial_product`; это закреплено тестом 1.4.
+- [x] 1.2 В `resources/views/components/catalog/card.blade.php` добавить ссылку-оверлей `.catalog-card__link` с `href` через `request()->fullUrlWithQuery(['product' => $slug])`, `aria-label="Открыть товар «{name}»"`, `aria-haspopup="dialog"`, `data-product-modal` и `data-product-slug`; в `resources/css/components/catalog-column.css` добавить `position: relative` карточке, абсолютную ссылку `inset: 0` и видимое фокус-кольцо. Проверка: `npm run build` проходит, а `php artisan test --filter=CatalogColumnRenderingTest` подтверждает ссылку и сохранение `season` в `href`.
+- [x] 1.3 Обновить `tests/Feature/CatalogColumnRenderingTest.php`: заменить проверки «в карточке нет ссылок» на наличие `.catalog-card__link` с корректными `href`, `aria-label` и `data-product-slug` у обычного и `out`-товара. Проверка: `php artisan test --filter=CatalogColumnRenderingTest` зелёный.
+- [x] 1.4 Расширить `tests/Feature/HomePageHttpTest.php`: `?product=antonovka` отдаёт `data-island="product-modal"` с `initial_product.slug`, `?product=kartofel` — `out`-товар, неизвестный slug — `initial_product: null`; контейнер окна находится вне `<main>`. Проверка: `php artisan test --filter=HomePageHttpTest` зелёный.
+
+## 2. Окно с содержимым по прямой ссылке
+
+- [x] 2.1 Создать `resources/js/types/product-modal.ts` с zod-схемой нужных окну полей (`slug`, `name`, `story_title`, `description`, `pack`, `facts`, `price`, `price_unit`, `status`, `stock`, `icon`, `category.name`, `harvest`) и пропсов `products`, `initial_product`, `preorder_url`; неизвестные ключи отбрасывать. Проверка: `npx vue-tsc --noEmit` проходит, схема принимает реальный `data-props` страницы (проверяется в e2e 2.6).
+- [x] 2.2 Создать `resources/js/lib/format-price.ts` с сигнатурой `formatPrice(price, unit)` и правилами Blade-цены: целые рубли, неразрывный пробел в тысячах, `₽`/`₽/кг` по `price_unit.id`. Проверка: `npx vue-tsc --noEmit` и `node -e "import('./resources/js/lib/format-price.ts').then(({ formatPrice }) => { const nbsp = String.fromCharCode(0xA0); if (formatPrice(1250, { id: 'rub', name: '₽' }) !== '1' + nbsp + '250 ₽') throw new Error('rub'); if (formatPrice(120, { id: 'rub_per_kg', name: '₽/кг' }) !== '120 ₽/кг') throw new Error('kg'); })"`.
+- [x] 2.3 Создать `resources/js/islands/ProductModal.vue` (Options API): overlay и панель `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, крестик 44×44 с `aria-label="Закрыть"` в правом верхнем углу прямоугольника вне арки, иллюстрация 120 px из `@/generated/product-icons.json`, надзаголовок «раздел · сбор», заголовок `story_title ?? name`, описание, факты отдельными чипами (пустой блок скрыт), цена через `format-price`; открывать окно на монтировании при наличии `initial_product`; зарегистрировать `product-modal` в `resources/js/app.ts`; создать `resources/css/components/product-modal.css` (ширина 520, отступы 52, типографика §7.3, арка, слои 30/31, перенос длинного названия) и импортировать в `app.css`. Проверка: `npx vue-tsc --noEmit`, `npm run build` и e2e 2.6.
+- [x] 2.4 Реализовать статусы §9.2: `in_stock` без бейджа и кнопки, `few` с бейджем «осталось N» (или «осталось мало» без остатка), `preorder` с бейджем и золотой кнопкой во всю ширину «Записаться на предзаказ» на `preorder_url`, `out` с приглушёнными иллюстрацией и ценой и пояснением вместо кнопки; не выводить «Отложить» и счётчик количества. Проверка: e2e 2.6 покрывает все четыре статуса и переход на `/preorder`.
+- [x] 2.5 Ограничить окно `max-height: calc(100vh - 64px)`, закрепить шапку и нижнюю часть, прокручивать только описание и показывать градиент 40 px у нижней границы описания. Проверка: e2e 2.6 на низком вьюпорте и коротком/длинном описании подтверждает отсутствие прокрутки окна и скролл только описания.
+- [x] 2.6 Добавить `tests/e2e/product-modal.spec.ts`: прямая ссылка открывает окно; проверены содержимое, ширина 520, отступы 52, иллюстрация 120, цены `650 ₽` и `120 ₽/кг`, факты, все статусы, отсутствие «Отложить»/количества, высота и скролл только описания. Проверка: `npm run test:e2e -- tests/e2e/product-modal.spec.ts` на поднятом `composer dev`.
+
+## 3. Открытие из карточки, история и клавиатура
+
+- [x] 3.1 Добавить в остров делегированный клик по `[data-product-modal]`: `preventDefault`, запоминание `DOMRect` карточки, `history.pushState({ productModal: true }, '', href)`, синхронизацию по `popstate` (известный `product` — открыть/обновить, иначе закрыть), закрытие крестика, Escape и клика по затемнению через `history.back()`; повторное открытие при уже открытом окне игнорировать. Проверка: e2e 3.5 проверяет открытие мышью, сохранение остальных query-параметров в URL, закрытие всеми способами и «Назад».
+- [x] 3.2 Для прямой ссылки создать синтетическую базовую запись: `replaceState` на URL без `product`, затем `pushState` с `product`; не дублировать её после reload/bfcache, если `history.state.productModal` уже выставлен; если состояние истории не наше, закрывать через `replaceState`, а не `back()`. Проверка: e2e 3.5 — «Назад» после deep link остаётся на странице и закрывает окно, reload не добавляет лишнюю запись, неизвестный slug окно не открывает.
+- [x] 3.3 Обеспечить клавиатурное открытие: Enter работает как нативный клик по ссылке, Space обрабатывается делегированным `keydown` с `preventDefault`; ссылка карточки имеет видимый фокус. Проверка: e2e 3.5 открывает окно с клавиатуры и проверяет фокус-кольцо.
+- [x] 3.4 Ограничить окно десктопом: проверять `matchMedia('(min-width: 1200px)')` перед открытием, не создавать историю на мобильном, а при переходе через брейкпоинт во время открытого окна закрывать его и снимать блокировки. Проверка: e2e 3.5 — на 1199 px прямая ссылка не открывает окно, а ресайз с 1440 на 1199 закрывает открытое.
+- [x] 3.5 Дополнить `tests/e2e/product-modal.spec.ts` сценариями истории, клавиатуры и брейкпоинта из 3.1–3.4. Проверка: `npm run test:e2e -- tests/e2e/product-modal.spec.ts` зелёный.
+
+## 4. Модальная доступность
+
+- [x] 4.1 Реализовать модальную семантику и фокус: `role="dialog"`, `aria-modal="true"`, доступное имя из названия товара, перевод фокуса на крестик, зацикливание Tab/Shift+Tab, `inert` на `header.site-header` и `main.site-main`, возврат фокуса на карточку-источник или H1 сезона. Проверка: e2e 4.4 проверяет атрибуты, `activeElement`, удержание фокуса внутри окна и возврат фокуса.
+- [x] 4.2 Заблокировать прокрутку страницы классом на `<html>` с компенсацией ширины скроллбара и гарантированно снимать блокировку при закрытии любым способом, размонтировании и смене брейкпоинта. Проверка: e2e 4.4 — страница не скроллится при открытом окне и снова скроллится после каждого способа закрытия.
+- [x] 4.3 Выставить слои по токенам: затемнение `--z-overlay`, окно `--z-dialog`; одновременно допускать только один слой и игнорировать повторные открытия. Проверка: e2e 4.4 — вычисленные `z-index` и один `[role="dialog"]` после двойного клика.
+- [x] 4.4 Дополнить `tests/e2e/product-modal.spec.ts` сценариями доступности из 4.1–4.3. Проверка: `npm run test:e2e -- tests/e2e/product-modal.spec.ts` зелёный.
+
+## 5. Анимация
+
+- [x] 5.1 Реализовать FLIP через Web Animations API: открытие из `DOMRect` карточки к центру за `--dur-slow` с `--ease-standard`, закрытие обратно за `--dur-base` с `--ease-exit`, затемнение вместе с панелью; при отсутствии карточки — раскрытие из центра; анимировать только `transform` и `opacity`, снимать инлайн-стили после завершения. Проверка: e2e 5.3 проверяет `getAnimations()` и `getTiming().duration` (400/250 ms), порядок закрытия и отсутствие анимации layout-свойств.
+- [x] 5.2 Учесть `prefers-reduced-motion: reduce`: без FLIP, только `opacity` 150 ms, закрытие 150 ms. Проверка: e2e 5.3 с `emulateMedia({ reducedMotion: 'reduce' })` — нет transform, длительность 150 ms.
+- [x] 5.3 Дополнить `tests/e2e/product-modal.spec.ts` сценариями анимации и reduced motion из 5.1–5.2. Проверка: `npm run test:e2e -- tests/e2e/product-modal.spec.ts` зелёный.
+
+## 6. Интеграционная проверка
+
+- [x] 6.1 Прогнать полный набор проверок: `php artisan test`, `./vendor/bin/pint --test`, `./vendor/bin/phpstan analyse`, `npm run lint`, `npx vue-tsc --noEmit`, `npm run build`, `npm run test:e2e` на `composer dev`; исправить найденные расхождения. Проверка: все команды завершаются успешно.
+- [x] 6.2 Сверить окно с кадром и ТЗ §7.3/§9.2 на 1440×900 и 1200×680, проверить отсутствие горизонтальной прокрутки и ошибок в консоли, а также fallback без JS: карточка остаётся ссылкой и ведёт на `?product=…`, страница не ломается. Проверка: состояния воспроизведены, e2e-сценарий без JavaScript зелёный.
+
+## Workflow follow-up
+
+- До начала apply переименовать каталог change'а `openspec/changes/-----5` в `openspec/changes/desktop-product-modal` (имя из `docs/plan/PLAN.md`): имя из дефисов нарушает `openspec/config.yaml`. После переименования использовать новое имя в командах OpenSpec.
+- После приёмки архивировать change и в этой же сессии обновить `docs/plan/PLAN.md`: фаза 5 → «✅ сделано», имя change'а в §3 и заголовке §4, актуальная «Текущая точка». Проверить, что заголовок и статус совпадают с содержимым `openspec/changes/archive`.

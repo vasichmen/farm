@@ -112,6 +112,8 @@ class CatalogColumnRenderingTest extends TestCase
 
     public function test_card_shows_illustration_overline_title_pack_price_and_status(): void
     {
+        $this->get('/?season=autumn');
+
         $product = $this->product('autumn', 'antonovka');
 
         $html = (string) $this->blade(
@@ -132,7 +134,13 @@ class CatalogColumnRenderingTest extends TestCase
         $this->assertStringContainsString('650 ₽', $html);
         $this->assertStringContainsString('--card-index: 3', $html);
         $this->assertStringContainsString('data-status="in_stock"', $html);
-        $this->assertStringNotContainsString('<a ', $html);
+        $this->assertStringContainsString('class="catalog-card__link"', $html);
+        $this->assertStringContainsString('season=autumn', $html);
+        $this->assertStringContainsString('product=antonovka', $html);
+        $this->assertStringContainsString('aria-label="Открыть товар «Антоновка»"', $html);
+        $this->assertStringContainsString('aria-haspopup="dialog"', $html);
+        $this->assertStringContainsString('data-product-modal', $html);
+        $this->assertStringContainsString('data-product-slug="antonovka"', $html);
         $this->assertStringNotContainsString('<button', $html);
     }
 
@@ -151,6 +159,8 @@ class CatalogColumnRenderingTest extends TestCase
 
     public function test_out_card_is_muted_and_shows_no_price(): void
     {
+        $this->get('/?season=autumn');
+
         $product = $this->product('autumn', 'kartofel');
 
         $html = (string) $this->blade(
@@ -162,7 +172,10 @@ class CatalogColumnRenderingTest extends TestCase
         $this->assertStringContainsString('нет в наличии', $html);
         $this->assertStringNotContainsString('catalog-card__price', $html);
         $this->assertStringNotContainsString('60 ₽', $html);
-        $this->assertStringNotContainsString('<a ', $html);
+        $this->assertStringContainsString('class="catalog-card__link"', $html);
+        $this->assertStringContainsString('product=kartofel', $html);
+        $this->assertStringContainsString('data-product-slug="kartofel"', $html);
+        $this->assertStringContainsString('aria-label="Открыть товар «Картофель»"', $html);
         $this->assertStringNotContainsString('<button', $html);
     }
 

@@ -84,3 +84,11 @@
         </div>
     </section>
 @endsection
+
+@push('overlays')
+    <x-product-modal
+        :products="$page['desktop_products']"
+        :initial-product="$page['product']"
+        :preorder-url="route('preorder')"
+    />
+@endpush
