@@ -97,7 +97,9 @@ test('неизвестное имя острова даёт предупрежд
     await expect(page.locator('[data-island="season-wheel"]').last().getByRole('tab')).toHaveCount(
         4,
     );
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Усадьба Лыково');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+        'Осенью в Лыково пахнет антоновкой и сушёными травами',
+    );
     expect(warnings.some((message) => message.includes('unknown-island'))).toBe(true);
 });
 
@@ -123,7 +125,9 @@ test('некорректный JSON пропускает только этот �
         4,
     );
     expect(errors.some((message) => message.includes('Не удалось разобрать данные'))).toBe(true);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Усадьба Лыково');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+        'Осенью в Лыково пахнет антоновкой и сушёными травами',
+    );
 });
 
 test('данные, не прошедшие проверку схемой, оставляют серверный fallback', async ({ page }) => {
@@ -168,7 +172,9 @@ test('данные, не прошедшие проверку схемой, ос�
     await expect(island.locator('.season-wheel__fallback a')).toHaveCount(4);
     await expect(island.locator('.season-wheel__fallback')).toContainText('УРОЖАЙ');
     expect(errors.some((message) => message.includes('не прошли проверку'))).toBe(true);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Усадьба Лыково');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+        'Осенью в Лыково пахнет антоновкой и сушёными травами',
+    );
 });
 
 test('серверный текст рядом с контейнером не меняется при монтировании', async ({ page }) => {

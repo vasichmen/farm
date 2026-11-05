@@ -17,7 +17,9 @@ class ExampleTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('<h1', false);
-        $response->assertSee('Усадьба Лыково');
+        $response->assertSee('Весной в Лыково появляется первая зелень');
+        $response->assertSee('Укроп');
+        $this->assertSame(1, substr_count($response->getContent(), '<h1'));
     }
 
     public function test_section_pages_are_available_by_named_routes(): void

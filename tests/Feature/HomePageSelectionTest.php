@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Enums\ProductStatusEnum;
 use App\Exceptions\SeasonNotFoundException;
 use App\Models\Product;
+use App\Models\Season;
+use App\Repositories\ProductRepository;
 use App\Repositories\SeasonRepository;
 use App\Services\HomePageService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -106,6 +108,91 @@ class HomePageSelectionTest extends TestCase
             $this->assertCount($mobileCount, $homePage->mobileProducts, $slug);
             $this->assertSame($mobileCount, $homePage->productsCount, $slug);
         }
+    }
+
+    public function test_desktop_products_keep_all_visible_desktop_products_in_sort_order(): void
+    {
+        $this->seed();
+
+        $expected = [
+            'spring' => [
+                'Укроп',
+                'Петрушка',
+                'Мята',
+                'Мелисса',
+                'Лист смородины',
+                'Иван-чай',
+                'Варенье смородиновое',
+                'Рассада томатов',
+            ],
+            'summer' => [
+                'Клубника',
+                'Малина',
+                'Смородина чёрная',
+                'Крыжовник',
+                'Ранние яблоки',
+                'Ромашка сушёная',
+                'Лист смородины',
+                'Кабачки',
+            ],
+            'autumn' => [
+                'Антоновка',
+                'Груша «Лада»',
+                'Слива сушёная',
+                'Яблочные чипсы',
+                'Тыква мускатная',
+                'Томаты',
+                'Морковь',
+                'Сбор «Усадебный»',
+            ],
+            'winter' => [
+                'Сбор «Усадебный»',
+                'Новогодний чайный набор',
+                'Варенье малиновое',
+                'Варенье смородиновое',
+                'Тыква в сиропе',
+                'Яблочные чипсы',
+                'Иван-чай',
+                'Слива сушёная',
+            ],
+        ];
+
+        foreach ($expected as $slug => $names) {
+            $homePage = HomePageService::getHomePage($slug);
+
+            $this->assertSame($names, $homePage->desktopProducts->pluck('name')->all(), $slug);
+            $this->assertNotContains('Картофель', $homePage->desktopProducts->pluck('name')->all(), $slug);
+        }
+    }
+
+    public function test_ninth_desktop_product_is_returned_when_it_is_marked_for_desktop(): void
+    {
+        $this->seed();
+
+        $product = ProductRepository::getBySlugWithRelations('myata');
+        $this->assertInstanceOf(Product::class, $product);
+
+        $pivot = $product->seasons->mapWithKeys(
+            static fn (Season $season): array => [
+                $season->id => [
+                    'sort_order' => (int) $season->pivot->sort_order,
+                    'show_on_desktop' => $season->slug === 'autumn'
+                        ? true
+                        : (bool) $season->pivot->show_on_desktop,
+                    'show_on_wheel' => (bool) $season->pivot->show_on_wheel,
+                    'wheel_order' => $season->pivot->wheel_order,
+                    'harvest' => $season->pivot->harvest,
+                ],
+            ],
+        );
+
+        ProductRepository::syncSeasons($product->id, $pivot->all());
+
+        $homePage = HomePageService::getHomePage('autumn');
+
+        $this->assertCount(9, $homePage->desktopProducts);
+        $this->assertCount(9, $homePage->mobileProducts);
+        $this->assertSame('Мята', $homePage->desktopProducts->last()?->name);
     }
 
     public function test_out_product_is_hidden_from_lists_and_counters_but_available_by_link(): void

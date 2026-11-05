@@ -1,0 +1,541 @@
+/* Правая колонка каталога на десктопной главной (фаза 4). */
+
+.catalog-column {
+    min-width: 0;
+    padding-top: clamp(0px, 1.2vh, 12px);
+}
+
+.catalog-header__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--h1-size);
+    font-weight: 600;
+    line-height: 1.04;
+}
+
+.catalog-header__title:focus {
+    outline: none;
+}
+
+.catalog-header__lead {
+    max-width: 600px;
+    margin: var(--space-12) 0 0;
+    font-size: clamp(14px, 1.6vh, 14.5px);
+    line-height: 1.55;
+    opacity: 0.88;
+}
+
+.catalog-column .card-grid {
+    margin-top: clamp(16px, 2.4vh, 22px);
+    padding: 0;
+    list-style: none;
+}
+
+/* Карточка */
+.catalog-card {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(12px, 1.8vh, 16px) var(--space-8) var(--space-10);
+    color: var(--color-deep-pine);
+    text-align: center;
+    background: var(--color-parchment);
+    border-radius: var(--radius-card-arch-desktop);
+}
+
+.catalog-card__pic {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: var(--card-icon-size);
+    height: var(--card-icon-size);
+    margin: var(--space-4) auto var(--space-6);
+    background: var(--color-icon-disc);
+    border-radius: var(--radius-circle);
+}
+
+.catalog-card__pic svg {
+    width: 78%;
+    height: 78%;
+}
+
+.catalog-card__overline {
+    margin: 0;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-brick);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.catalog-card__title {
+    display: -webkit-box;
+    min-height: 2.1em;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-size: clamp(17px, 2.05vh, 18.5px);
+    font-weight: 700;
+    line-height: 1.05;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.catalog-card__pack {
+    margin: var(--space-4) 0 0;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: var(--opacity-secondary-on-light);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.catalog-card__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: var(--space-8);
+    border-top: var(--border-hairline) solid var(--color-line-on-light);
+}
+
+.catalog-card__price {
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* Строка статуса фиксированной высоты: baseline карточек в ряду не ломается. */
+.catalog-card__status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 18px;
+    line-height: 1.2;
+}
+
+.catalog-card__badge {
+    display: inline-flex;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: var(--radius-badge-arch);
+}
+
+.catalog-card__badge--few {
+    color: var(--badge-few-text);
+    background: var(--badge-few-bg);
+}
+
+.catalog-card__badge--preorder {
+    color: var(--badge-pre-text);
+    background: var(--badge-pre-bg);
+}
+
+.catalog-card__out {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--badge-out-text);
+    letter-spacing: 0.3px;
+}
+
+.catalog-card--out .catalog-card__pic {
+    filter: grayscale(0.7);
+    opacity: 0.6;
+}
+
+/* Полоса «Дальше — …» */
+.catalog-column .catalog-next {
+    display: flex;
+    gap: var(--space-16);
+    align-items: center;
+    margin-top: clamp(16px, 2.4vh, 22px);
+    padding: var(--space-12) var(--space-18);
+    color: var(--color-parchment);
+    text-decoration: none;
+    border: var(--border-hairline) solid var(--color-line-on-dark);
+    outline: 1px solid rgba(217, 201, 163, 0.4);
+    outline-offset: 4px;
+}
+
+.catalog-next__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    background: var(--color-parchment);
+    border-radius: var(--radius-circle);
+}
+
+.catalog-next__icon svg {
+    width: 34px;
+    height: 34px;
+}
+
+.catalog-next__text {
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+
+.catalog-next__cta {
+    margin-left: auto;
+    color: var(--color-honey);
+    white-space: nowrap;
+    padding-block: var(--space-12);
+}
+
+/* Карусель */
+.catalog-carousel__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 3 * var(--size-card-gap-x)) / 4);
+    gap: var(--size-card-gap-x);
+    padding: 0;
+    margin: clamp(16px, 2.4vh, 22px) 0 0;
+    overflow-x: auto;
+    list-style: none;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.catalog-carousel__track::-webkit-scrollbar {
+    display: none;
+}
+
+.catalog-carousel__track:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus-on-dark);
+    outline-offset: var(--focus-offset);
+}
+
+.catalog-carousel__track > .catalog-card {
+    scroll-snap-align: start;
+}
+
+.catalog-carousel__island {
+    display: block;
+    min-height: calc(var(--size-tap-min) + var(--space-14));
+}
+
+.catalog-carousel__controls {
+    display: flex;
+    gap: var(--space-12);
+    align-items: center;
+    margin-top: var(--space-14);
+}
+
+.catalog-carousel__controls--inactive {
+    visibility: hidden;
+}
+
+.catalog-carousel__arrow {
+    display: grid;
+    place-items: center;
+    width: var(--size-tap-min);
+    height: var(--size-tap-min);
+    padding: 0;
+    color: var(--color-parchment);
+    cursor: pointer;
+    background: transparent;
+    border: var(--border-hairline) solid var(--color-line-on-dark);
+    border-radius: var(--radius-circle);
+    transition:
+        border-color var(--dur-fast) var(--ease-standard),
+        color var(--dur-fast) var(--ease-standard);
+}
+
+.catalog-carousel__arrow:hover {
+    color: var(--color-honey);
+    border-color: var(--color-honey);
+}
+
+.catalog-carousel__arrow[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: var(--opacity-disabled);
+}
+
+.catalog-carousel__progress {
+    flex: 1;
+    height: 2px;
+    background: var(--color-line-on-dark);
+}
+
+.catalog-carousel__progress-bar {
+    height: 100%;
+    background: var(--color-honey);
+    transition: width var(--dur-fast) var(--ease-standard);
+}
+
+/* Скелетоны */
+.catalog-skeleton__title,
+.catalog-skeleton__lead,
+.catalog-skeleton__line {
+    position: relative;
+    overflow: hidden;
+    background: rgba(243, 235, 219, 0.1);
+    border-radius: var(--radius-button);
+}
+
+.catalog-skeleton__title {
+    height: 40px;
+    max-width: 90%;
+}
+
+.catalog-skeleton__title--short {
+    max-width: 70%;
+    margin-top: var(--space-8);
+}
+
+.catalog-skeleton__lead {
+    height: 14px;
+    max-width: 80%;
+    margin-top: var(--space-18);
+}
+
+.catalog-skeleton__lead--short {
+    max-width: 60%;
+    margin-top: var(--space-8);
+}
+
+.catalog-skeleton__grid {
+    margin-top: clamp(16px, 2.4vh, 22px);
+}
+
+.catalog-skeleton__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 180px;
+    padding: clamp(12px, 1.8vh, 16px) var(--space-8) var(--space-10);
+    background: rgba(243, 235, 219, 0.1);
+    border-radius: var(--radius-card-arch-desktop);
+}
+
+.catalog-skeleton__icon {
+    width: var(--card-icon-size);
+    height: var(--card-icon-size);
+    margin: var(--space-4) auto var(--space-8);
+    background: rgba(243, 235, 219, 0.12);
+    border-radius: var(--radius-circle);
+}
+
+.catalog-skeleton__line {
+    width: 70%;
+    height: 14px;
+}
+
+.catalog-skeleton__line--short {
+    width: 45%;
+    height: 10px;
+    margin-top: var(--space-8);
+}
+
+/* Пустой сезон и ошибка */
+.catalog-state {
+    margin-top: var(--space-24);
+    padding: 56px var(--space-40) 34px;
+    text-align: center;
+    border: var(--border-hairline) dashed var(--color-line-on-dark);
+    border-radius: 200px 200px var(--radius-calendar) var(--radius-calendar);
+}
+
+.catalog-state__icon {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    margin: 0 auto var(--space-14);
+    color: var(--color-deep-pine);
+    background: var(--color-parchment);
+    border-radius: var(--radius-circle);
+}
+
+.catalog-state__icon .ui-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.catalog-state__icon--error {
+    color: var(--color-brick);
+    background: var(--color-error-bg);
+}
+
+.catalog-state__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.catalog-state__text {
+    max-width: 420px;
+    margin: var(--space-8) auto 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    opacity: 0.88;
+}
+
+.catalog-column .catalog-state__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-10);
+    margin-top: var(--space-20);
+    padding: 15px var(--space-24);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: var(--color-parchment);
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: var(--border-hairline) solid var(--color-flax);
+    border-radius: var(--radius-button);
+    outline: 1px solid var(--color-flax);
+    outline-offset: 3px;
+}
+
+.catalog-column .catalog-state__button--filled {
+    color: var(--color-ink);
+    background: var(--color-antique-gold);
+    border-color: var(--color-antique-gold);
+    outline: none;
+}
+
+/* Наведение карточки из §14.5; карточка пока не интерактивна. */
+@media (hover: hover) {
+    .catalog-card {
+        transition:
+            transform var(--dur-base) var(--ease-standard),
+            box-shadow var(--dur-base) var(--ease-standard);
+    }
+
+    .catalog-card__pic svg {
+        transition: transform var(--dur-base) var(--ease-standard);
+    }
+
+    .catalog-card:hover {
+        box-shadow: var(--shadow-card-hover);
+        transform: translateY(-6px);
+    }
+
+    .catalog-card:hover .catalog-card__pic svg {
+        transform: scale(1.08) rotate(-4deg);
+    }
+}
+
+/* Смена сезона: выход в старом документе и вход в новом. */
+@keyframes catalog-card-out {
+    to {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+@keyframes catalog-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes catalog-text-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes catalog-text-out {
+    to {
+        opacity: 0;
+    }
+}
+
+#catalog-column[data-leaving] .catalog-card {
+    animation: catalog-card-out var(--dur-base) var(--ease-exit) both;
+}
+
+#catalog-column[data-leaving] .catalog-header__title,
+#catalog-column[data-leaving] .catalog-header__lead {
+    animation: catalog-text-out 200ms var(--ease-exit) both;
+}
+
+#catalog-column[data-leaving] .catalog-next {
+    animation: catalog-text-out 200ms var(--ease-exit) both;
+}
+
+html[data-entrance='on'] .catalog-header__title {
+    animation: catalog-text-in 200ms var(--ease-standard) both;
+}
+
+html[data-entrance='on'] .catalog-header__lead {
+    animation: catalog-text-in 200ms var(--ease-standard) 200ms both;
+}
+
+html[data-entrance='on'] .catalog-card {
+    animation: catalog-card-in var(--dur-base) var(--ease-standard) both;
+    animation-delay: calc(var(--card-index, 0) * var(--dur-stagger) + 200ms);
+}
+
+html[data-entrance='on'] .catalog-next {
+    animation: catalog-text-in 200ms var(--ease-standard) 200ms both;
+}
+
+/* Ниже 1200 px остаются заголовок, лид и состояния: карточки и карусель — фаза 7. */
+@media (max-width: 1199px) {
+    .catalog-column__grid,
+    .catalog-carousel,
+    .catalog-column .catalog-next {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .catalog-card,
+    .catalog-card__pic svg {
+        transition-property: opacity;
+        transition-duration: var(--dur-fast);
+    }
+
+    .catalog-card:hover {
+        box-shadow: none;
+        transform: none;
+    }
+
+    .catalog-card:hover .catalog-card__pic svg {
+        transform: none;
+    }
+
+    #catalog-column[data-leaving] .catalog-card,
+    #catalog-column[data-leaving] .catalog-header__title,
+    #catalog-column[data-leaving] .catalog-header__lead,
+    #catalog-column[data-leaving] .catalog-next,
+    html[data-entrance='on'] .catalog-header__title,
+    html[data-entrance='on'] .catalog-header__lead,
+    html[data-entrance='on'] .catalog-card,
+    html[data-entrance='on'] .catalog-next {
+        animation: none;
+    }
+}

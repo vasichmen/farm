@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import productIcons from '@/generated/product-icons.json';
+import { navigateToSeason } from '@/lib/season-navigation';
 import {
     WHEEL_ORDER,
     type SeasonWheelProps,
@@ -508,6 +509,8 @@ export default defineComponent({
             }
 
             this.storeTransition(sector.slug);
+            event.preventDefault();
+            navigateToSeason(sector.url);
         },
         onKeydown(event: KeyboardEvent, sector: SectorView): void {
             const currentIndex = this.seasons.findIndex((item) => item.slug === sector.slug);
@@ -546,7 +549,7 @@ export default defineComponent({
             }
 
             this.storeTransition(season.slug);
-            window.location.href = season.url;
+            navigateToSeason(season.url);
         },
         storeTransition(season: string): void {
             const record: TransitionRecord = {
@@ -869,10 +872,12 @@ export default defineComponent({
                         :data-active="sector.active ? 'true' : 'false'"
                     >
                         <a
+                            :id="`season-tab-${sector.slug}`"
                             :href="sector.url"
                             class="season-wheel__sector-link"
                             role="tab"
                             draggable="false"
+                            aria-controls="catalog-column"
                             :aria-selected="sector.active ? 'true' : 'false'"
                             :aria-label="sector.ariaLabel"
                             :tabindex="sector.active ? 0 : -1"

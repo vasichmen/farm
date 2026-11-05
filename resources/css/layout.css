@@ -52,6 +52,7 @@ body[data-season='summer'] {
     display: grid;
     grid-template-columns: var(--wheel) minmax(0, var(--size-right-column-max));
     column-gap: var(--col-gap);
+    align-items: start;
 }
 
 /* Ниже 1200 px колесо и колонка не стоят рядом: остаётся обычный поток. */

@@ -16,8 +16,6 @@ use Laravel\Foundation\Abstracts\AbstractService;
 
 class HomePageService extends AbstractService
 {
-    private const DESKTOP_LIMIT = 8;
-
     private const WHEEL_LIMIT = 4;
 
     /**
@@ -52,7 +50,6 @@ class HomePageService extends AbstractService
 
         $desktopProducts = $activeProducts
             ->filter(static fn (Product $product): bool => self::pivotValue($product, 'show_on_desktop'))
-            ->take(self::DESKTOP_LIMIT)
             ->values();
 
         $wheelProductsBySeason = $seasonProducts->map(

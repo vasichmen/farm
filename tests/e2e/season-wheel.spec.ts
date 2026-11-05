@@ -485,6 +485,8 @@ test.describe('без JavaScript', () => {
         await fallback.getByRole('link', { name: /Зима/ }).click();
         await page.waitForURL('**/?season=winter');
         await expect(page.locator('body')).toHaveAttribute('data-season', 'winter');
-        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Усадьба Лыково');
+        await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+            'Зимой в Лыково заваривают травы и открывают варенье',
+        );
     });
 });

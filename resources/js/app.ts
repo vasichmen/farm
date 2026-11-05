@@ -1,6 +1,9 @@
 import { createApp, type Component } from 'vue';
 import type { ZodType } from 'zod';
+import CatalogCarousel from '@/islands/CatalogCarousel.vue';
 import SeasonWheel from '@/islands/SeasonWheel.vue';
+import { initSeasonNavigation } from '@/lib/season-navigation';
+import { catalogCarouselSchema } from '@/types/catalog-carousel';
 import { seasonWheelSchema } from '@/types/season-wheel';
 
 interface IslandDefinition {
@@ -12,6 +15,10 @@ const islands: Record<string, IslandDefinition> = {
     'season-wheel': {
         component: SeasonWheel,
         schema: seasonWheelSchema,
+    },
+    'catalog-carousel': {
+        component: CatalogCarousel,
+        schema: catalogCarouselSchema,
     },
 };
 
@@ -90,8 +97,13 @@ function mountIslands(): void {
     });
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountIslands, { once: true });
-} else {
+function start(): void {
+    initSeasonNavigation();
     mountIslands();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+} else {
+    start();
 }
